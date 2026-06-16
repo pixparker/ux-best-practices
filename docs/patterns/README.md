@@ -9,6 +9,7 @@ Reusable solutions to recurring interaction problems. A pattern describes *what 
 - [Bottom sheets & the thumb zone](bottom-sheet-and-thumb-zone.md) — put primary actions within mobile reach.
 - [Back-friendly modals & overlays](back-friendly-modals.md) — Back/Esc/✕ close the modal, not the page. *(has runnable demo)*
 - [Lock background scroll when a modal is open](lock-scroll-when-modal-open.md) — freeze the page behind an overlay, restore position on close. *(has runnable demo)*
+- [Swipe to dismiss (drawers & sheets)](swipe-to-dismiss-drawers.md) — dismiss an overlay in the direction it entered. *(has runnable demo)*
 
 ## Planned
 

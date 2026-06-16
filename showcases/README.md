@@ -18,7 +18,7 @@ open showcases/skeleton-loading/index.html      # macOS
 | Demo | Demonstrates | Doc |
 | --- | --- | --- |
 | [`skeleton-loading/`](skeleton-loading/) | Perceived performance: skeleton vs. spinner | [techniques/skeleton-loading](../docs/techniques/skeleton-loading.md) |
-| [`back-friendly-modals/`](back-friendly-modals/) | Back button closes the modal, not the page (History API) | [patterns/back-friendly-modals](../docs/patterns/back-friendly-modals.md) |
+| [`back-friendly-modals/`](back-friendly-modals/) | The modal family: Back closes the modal (History API), background **scroll lock**, and **swipe-to-dismiss** drawer | [back-friendly-modals](../docs/patterns/back-friendly-modals.md) · [scroll-lock](../docs/patterns/lock-scroll-when-modal-open.md) · [swipe-to-dismiss](../docs/patterns/swipe-to-dismiss-drawers.md) |
 
 ## Conventions
 
