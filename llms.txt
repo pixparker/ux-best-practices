@@ -1,0 +1,46 @@
+# UX & UI Best Practices
+
+> A living, principle-first reference for building interfaces people love to use — across mobile web, PWAs, online shops, desktop, web, and conversational/bot UIs. It is both a written guideline and a runnable code showcase.
+
+This repo is organized along two axes — **archetypes** (what you're building) and **platforms** (where it runs) — plus craft topics (principles, UI, patterns, techniques) and actionable checklists. Agents should read the relevant guideline before implementing UI. Start with AGENTS.md for the operating rules.
+
+## Start here (for agents)
+- [AGENTS.md](AGENTS.md): UX/UI operating rules and non-negotiable defaults for AI agents.
+- [Docs index](docs/README.md): the full map of the reference.
+- [Entry template](docs/_TEMPLATE.md): the shape and front-matter of every guideline.
+
+## Principles (why)
+- [Feedback for every action](docs/principles/feedback-for-every-action.md): every action needs an immediate, visible response.
+- [Principles index](docs/principles/README.md): timeless UX/UI laws.
+
+## UI craft (look)
+- [Type scale & readability](docs/ui/type-scale-and-readability.md): a small, consistent type system; body ≥ 16px on mobile.
+- [UI index](docs/ui/README.md): typography, color, spacing, motion, components.
+
+## Patterns (behavior)
+- [Patterns index](docs/patterns/README.md): reusable solutions to recurring interaction problems.
+
+## Techniques (feel)
+- [Skeleton loading](docs/techniques/skeleton-loading.md): layout-shaped placeholders beat blank spinners.
+- [Techniques index](docs/techniques/README.md): perceived-performance and smoothness techniques.
+
+## Archetypes (what you're building)
+- [Ops / admin panel](docs/archetypes/ops-admin-panel.md): power users — density, tables, keyboard, bulk actions.
+- [Consumer mobile app](docs/archetypes/consumer-mobile-app.md): non-technical users — simplicity, guidance, forgiveness.
+- [Fancy app](docs/archetypes/fancy-app.md): few features, high polish and delight.
+- [E-commerce](docs/archetypes/ecommerce.md): trust and conversion — find, decide, buy.
+- [Conversational / bot](docs/archetypes/conversational-bot.md): chat & assistant UIs — turn-taking, affordance, trust.
+- [Game app](docs/archetypes/game-app.md): players — feedback, flow, reward loops (early).
+- [Archetypes index](docs/archetypes/README.md): how to use archetype playbooks.
+
+## Platforms (where it runs)
+- [Platforms index](docs/platforms/README.md): mobile web, PWA, desktop, web constraints.
+
+## Checklists (ship it)
+- [Mobile UX checklist](docs/checklists/mobile-ux-checklist.md): pre-ship pass for mobile screens.
+- [Checklists index](docs/checklists/README.md): actionable lists.
+
+## Code
+- [Showcases](showcases/README.md): runnable single-technique demos (standalone HTML).
+- [Playground](playground/README.md): interactive React gallery to explore demos live.
+- [Prototypes](prototypes/README.md): complete sample React apps demonstrating a whole style/archetype.
