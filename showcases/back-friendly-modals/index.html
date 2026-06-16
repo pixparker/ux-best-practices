@@ -36,7 +36,8 @@
     .scrim.show { opacity: 1; pointer-events: auto; }
     .sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--card);
       border-radius: 20px 20px 0 0; box-shadow: 0 -8px 40px rgba(0,0,0,.2); padding: 8px 18px calc(20px + env(safe-area-inset-bottom));
-      transform: translateY(110%); transition: transform .26s cubic-bezier(.2,.8,.2,1); max-width: 480px; margin: 0 auto; max-height: 86vh; overflow: auto; }
+      transform: translateY(110%); transition: transform .26s cubic-bezier(.2,.8,.2,1); max-width: 480px; margin: 0 auto; max-height: 86vh; overflow: auto;
+      overscroll-behavior: contain; /* stop scroll-chaining into the page */ }
     .sheet.show { transform: translateY(0); }
     .sheet.second { z-index: 30; }
     .grip { width: 40px; height: 5px; background: var(--line); border-radius: 999px; margin: 8px auto 12px; }
@@ -93,6 +94,15 @@
       { id: 'baklava',emoji: '🍯', name: 'Pistachio Baklava',price: '$9', desc: 'Filo, pistachio, honey syrup',
         body: 'Layers of crisp filo with ground pistachio, soaked in orange-blossom honey syrup.',
         ingredients: ['Filo pastry', 'Pistachio', 'Honey', 'Butter', 'Orange blossom'] },
+      { id: 'falafel',emoji: '🧆', name: 'Falafel Wrap',     price: '$11', desc: 'Crispy falafel, tahini, pickles',
+        body: 'House-fried falafel in warm flatbread with tahini, pickled turnip, and herbs.',
+        ingredients: ['Chickpeas', 'Herbs', 'Tahini', 'Pickled turnip', 'Flatbread'] },
+      { id: 'shawarma',emoji: '🌯', name: 'Chicken Shawarma', price: '$13', desc: 'Marinated chicken, garlic sauce',
+        body: 'Spit-roasted marinated chicken with toum garlic sauce, tomato, and fries.',
+        ingredients: ['Chicken', 'Toum (garlic)', 'Tomato', 'Fries', 'Flatbread'] },
+      { id: 'mint-tea',emoji: '🍵', name: 'Moroccan Mint Tea',price: '$5', desc: 'Green tea, fresh mint, sugar',
+        body: 'Traditional gunpowder green tea steeped with fresh spearmint, poured from height.',
+        ingredients: ['Green tea', 'Spearmint', 'Sugar'] },
     ];
 
     const menuEl = document.getElementById('menu');
@@ -147,8 +157,30 @@
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') dismiss(); });
     scrim.addEventListener('click', dismiss);
 
+    // ---- lock background scroll while any overlay is open (iOS-safe, position-fixed + restore) ----
+    let scrollLocked = false, savedY = 0;
+    function syncScrollLock() {
+      const shouldLock = stack.length > 0;
+      if (shouldLock && !scrollLocked) {
+        savedY = window.scrollY;
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${savedY}px`;
+        document.body.style.width = '100%';
+        scrollLocked = true;
+        log('page scroll locked (saved y=' + savedY + ')', 'scroll-lock');
+      } else if (!shouldLock && scrollLocked) {
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        scrollLocked = false;
+        window.scrollTo(0, savedY);
+        log('page scroll unlocked → restored y=' + savedY, 'scroll-lock');
+      }
+    }
+
     // ---- render overlays from the stack ----
     function render() {
+      syncScrollLock();
       document.querySelectorAll('.sheet').forEach((el) => el.remove());
       scrim.classList.toggle('show', stack.length > 0);
 

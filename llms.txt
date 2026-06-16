@@ -27,6 +27,7 @@ This repo is organized along two axes — **archetypes** (what you're building) 
 - [Empty states](docs/patterns/empty-states.md): turn empty screens into onboarding; handle first-run vs no-results.
 - [Bottom sheets & the thumb zone](docs/patterns/bottom-sheet-and-thumb-zone.md): place primary mobile actions within thumb reach.
 - [Back-friendly modals & overlays](docs/patterns/back-friendly-modals.md): hook overlays into browser history so Back/Esc/scrim/✕ close the modal instead of unloading the page.
+- [Lock background scroll when a modal is open](docs/patterns/lock-scroll-when-modal-open.md): freeze the page behind an open overlay (overscroll-behavior + position-fixed), keep the modal scrollable, restore scroll position on close.
 - [Patterns index](docs/patterns/README.md): reusable solutions to recurring interaction problems.
 
 ## Techniques (feel)

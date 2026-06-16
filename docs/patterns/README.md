@@ -8,6 +8,7 @@ Reusable solutions to recurring interaction problems. A pattern describes *what 
 - [Empty states](empty-states.md) — turn "nothing here" into onboarding.
 - [Bottom sheets & the thumb zone](bottom-sheet-and-thumb-zone.md) — put primary actions within mobile reach.
 - [Back-friendly modals & overlays](back-friendly-modals.md) — Back/Esc/✕ close the modal, not the page. *(has runnable demo)*
+- [Lock background scroll when a modal is open](lock-scroll-when-modal-open.md) — freeze the page behind an overlay, restore position on close. *(has runnable demo)*
 
 ## Planned
 
