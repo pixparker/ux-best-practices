@@ -19,6 +19,7 @@ open showcases/skeleton-loading/index.html      # macOS
 | --- | --- | --- |
 | [`skeleton-loading/`](skeleton-loading/) | Perceived performance: skeleton vs. spinner | [techniques/skeleton-loading](../docs/techniques/skeleton-loading.md) |
 | [`back-friendly-modals/`](back-friendly-modals/) | The modal family: Back closes the modal (History API), background **scroll lock**, and **swipe-to-dismiss** overlays from **all 4 sides** (sheet ↓, top ↑, left ←, right →) | [back-friendly-modals](../docs/patterns/back-friendly-modals.md) · [scroll-lock](../docs/patterns/lock-scroll-when-modal-open.md) · [swipe-to-dismiss](../docs/patterns/swipe-to-dismiss-drawers.md) |
+| [`tap-feedback/`](tap-feedback/) | Kill the default mobile **tap-highlight** flash; replace with intentional `:active` feedback, keep keyboard focus | [ui/tap-and-touch-feedback](../docs/ui/tap-and-touch-feedback.md) |
 
 ## Conventions
 

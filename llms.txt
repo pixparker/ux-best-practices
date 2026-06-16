@@ -20,6 +20,7 @@ This repo is organized along two axes — **archetypes** (what you're building) 
 - [Type scale & readability](docs/ui/type-scale-and-readability.md): a small, consistent type system; body ≥ 16px on mobile.
 - [Spacing & layout (8-pt grid)](docs/ui/spacing-and-layout.md): snap all spacing to one 4/8-based scale for visual rhythm.
 - [Color, contrast & dark mode](docs/ui/color-contrast-and-dark-mode.md): semantic color tokens, WCAG AA contrast, dark mode as its own theme.
+- [Intentional tap & touch feedback](docs/ui/tap-and-touch-feedback.md): remove the default mobile tap-highlight flash (-webkit-tap-highlight-color), add your own :active feedback, keep :focus-visible for keyboard users.
 - [UI index](docs/ui/README.md): typography, color, spacing, motion, components.
 
 ## Patterns (behavior)

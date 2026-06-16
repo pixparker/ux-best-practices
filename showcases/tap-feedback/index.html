@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Tap & Touch Feedback — UX Showcase</title>
+  <meta name="description" content="Kill the default mobile tap-highlight flash and replace it with intentional, accessible feedback." />
+  <style>
+    :root {
+      --bg: #f4f7fa; --card: #fff; --ink: #1b2330; --muted: #6b7689;
+      --line: #e6ebf1; --brand: #3b82f6; --focus: #3b82f6;
+      --radius: 14px; --shadow: 0 1px 2px rgba(16,24,40,.06), 0 8px 24px rgba(16,24,40,.06);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--ink); background: var(--bg); -webkit-font-smoothing: antialiased;
+      padding: max(16px, env(safe-area-inset-top)) 16px 48px; }
+    .wrap { max-width: 520px; margin: 0 auto; }
+    header { padding: 22px 4px 8px; }
+    h1 { font-size: 1.5rem; margin: 0 0 6px; letter-spacing: -.01em; }
+    p.sub { color: var(--muted); margin: 0 0 14px; }
+    .callout { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; border-radius: 12px; padding: 11px 13px; font-size: .9rem; margin: 0 0 16px; }
+
+    /* --- the toggle (always intentionally styled) --- */
+    .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; background: var(--card); margin-bottom: 6px;
+      -webkit-tap-highlight-color: transparent; }
+    .seg button { border: 0; background: transparent; color: var(--ink); padding: 11px 18px; font: inherit; font-weight: 700; cursor: pointer;
+      -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; }
+    .seg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+    .mode-label { color: var(--muted); font-size: .85rem; margin: 4px 0 18px; }
+
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .tappable { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow);
+      padding: 18px 14px; font: inherit; color: inherit; cursor: pointer; text-align: center; }
+    .tappable .ico { font-size: 1.8rem; display: block; margin-bottom: 6px; }
+    .tappable .lbl { font-weight: 700; }
+    .bar { grid-column: 1 / -1; display: flex; gap: 10px; }
+    .bar .tappable { flex: 1; }
+    .pill { background: var(--brand); color: #fff; border: 0; }
+    .pill .lbl, .pill .ico { color: #fff; }
+
+    .selectable { margin-top: 22px; color: var(--muted); font-size: .9rem; }
+    .selectable b { color: var(--ink); }
+
+    /* ===========================================================
+       MODE: default  — leave the browser's touch defaults in place.
+       On a touch device every tap flashes the tap-highlight box. */
+    body.mode-default .tappable {
+      -webkit-tap-highlight-color: rgba(30, 100, 255, .35); /* the default flash (exaggerated so it's obvious on touch) */
+    }
+    /* no :active feedback in default mode → taps feel "dead" on desktop too */
+
+    /* ===========================================================
+       MODE: polished — own the touch feedback. */
+    body.mode-polished .tappable {
+      -webkit-tap-highlight-color: transparent;   /* no flash */
+      -webkit-touch-callout: none;                /* no iOS long-press menu */
+      touch-action: manipulation;                 /* no 300ms delay / double-tap zoom */
+      user-select: none;                          /* UI isn't selectable */
+      transition: transform .08s ease, box-shadow .15s ease;
+    }
+    body.mode-polished .tappable:active { transform: scale(.96); box-shadow: 0 1px 2px rgba(16,24,40,.06); }
+
+    /* focus stays visible for keyboard users in BOTH modes (accessibility) */
+    :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+    :focus:not(:focus-visible) { outline: none; }
+
+    /* real text stays selectable */
+    .selectable { user-select: text; }
+
+    @media (prefers-reduced-motion: reduce) {
+      body.mode-polished .tappable { transition: none; }
+      body.mode-polished .tappable:active { transform: none; }
+    }
+  </style>
+</head>
+<body class="mode-default">
+  <div class="wrap">
+    <header>
+      <h1>Tap &amp; touch feedback</h1>
+      <p class="sub">The blue/grey flash on tap is the browser's default. Own it instead.</p>
+      <div class="callout">📱 <b>Open this on your phone.</b> In <b>Default</b>, every tap flashes the highlight box. In <b>Polished</b>, it's gone and replaced by a crisp press. Press <kbd>Tab</kbd> to confirm the keyboard focus ring still works in both.</div>
+
+      <div class="seg" role="group" aria-label="Mode">
+        <button id="mDefault" aria-pressed="true">Default</button>
+        <button id="mPolished" aria-pressed="false">Polished</button>
+      </div>
+      <p class="mode-label" id="modeLabel">Mode: browser default — tap highlight left on.</p>
+    </header>
+
+    <main class="grid">
+      <button class="tappable"><span class="ico">🍔</span><span class="lbl">Burgers</span></button>
+      <button class="tappable"><span class="ico">🍕</span><span class="lbl">Pizza</span></button>
+      <button class="tappable"><span class="ico">🥗</span><span class="lbl">Salads</span></button>
+      <button class="tappable"><span class="ico">🍰</span><span class="lbl">Desserts</span></button>
+      <div class="bar">
+        <button class="tappable pill"><span class="lbl">Add to order</span></button>
+        <button class="tappable"><span class="lbl">Details</span></button>
+      </div>
+    </main>
+
+    <p class="selectable">This paragraph is <b>real content</b>, so it stays selectable — try selecting this text. Only the interactive chrome above disables selection.</p>
+  </div>
+
+  <script>
+    const body = document.body;
+    const bDef = document.getElementById('mDefault');
+    const bPol = document.getElementById('mPolished');
+    const label = document.getElementById('modeLabel');
+
+    function setMode(mode) {
+      body.classList.toggle('mode-default', mode === 'default');
+      body.classList.toggle('mode-polished', mode === 'polished');
+      bDef.setAttribute('aria-pressed', String(mode === 'default'));
+      bPol.setAttribute('aria-pressed', String(mode === 'polished'));
+      label.textContent = mode === 'default'
+        ? 'Mode: browser default — tap highlight left on.'
+        : 'Mode: polished — highlight removed, intentional :active press added.';
+    }
+
+    bDef.addEventListener('click', () => setMode('default'));
+    bPol.addEventListener('click', () => setMode('polished'));
+  </script>
+</body>
+</html>

@@ -7,9 +7,10 @@ A **platform** is a delivery context. It imposes constraints and conventions ind
 ## Platforms
 
 ### 📲 Mobile web
-- Thumb zones & reachability (bottom-anchored primary actions)
+- Thumb zones & reachability (bottom-anchored primary actions) — [bottom sheets & thumb zone](../patterns/bottom-sheet-and-thumb-zone.md)
 - Tap targets ≥ 44×44px, generous spacing
 - `font-size ≥ 16px` on inputs (avoid iOS zoom-on-focus)
+- Own your touch feedback — kill the default tap-highlight flash — [tap & touch feedback](../ui/tap-and-touch-feedback.md)
 - Safe areas (`env(safe-area-inset-*)`), no hover-only affordances
 - Performance on mid-range devices & flaky networks
 
