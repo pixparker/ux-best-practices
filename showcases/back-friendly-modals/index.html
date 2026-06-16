@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Back-friendly Modals — UX Showcase</title>
+  <meta name="description" content="A QR-menu where the Back button closes the modal instead of leaving the page." />
+  <style>
+    :root {
+      --bg: #faf7f2; --card: #fff; --ink: #2a2117; --muted: #8a7f70;
+      --line: #ece4d8; --brand: #c2410c; --accent: #f59e0b;
+      --radius: 16px; --shadow: 0 1px 2px rgba(0,0,0,.06), 0 12px 28px rgba(0,0,0,.10);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--ink); background: var(--bg); -webkit-font-smoothing: antialiased; }
+    .wrap { max-width: 480px; margin: 0 auto; padding: max(16px, env(safe-area-inset-top)) 16px 40px; }
+    header { padding: 20px 4px 8px; }
+    .kicker { color: var(--brand); font-weight: 700; letter-spacing: .04em; text-transform: uppercase; font-size: .75rem; margin: 0; }
+    h1 { font-size: 1.6rem; margin: 4px 0 6px; letter-spacing: -.01em; }
+    .hint { color: var(--muted); margin: 0 0 8px; font-size: .95rem; }
+    .callout { background: #fff7ed; border: 1px solid #fed7aa; color: #7c2d12; border-radius: 12px; padding: 10px 12px; font-size: .9rem; margin: 12px 0 4px; }
+
+    .menu { display: grid; gap: 12px; margin-top: 16px; }
+    .item { display: flex; gap: 14px; align-items: center; background: var(--card); border: 1px solid var(--line);
+      border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px; text-align: left; cursor: pointer; width: 100%; font: inherit; color: inherit;
+      transition: transform .08s ease; }
+    .item:active { transform: scale(.985); }
+    .emoji { font-size: 2rem; width: 52px; height: 52px; display: grid; place-items: center; background: var(--bg); border-radius: 12px; flex: 0 0 auto; }
+    .item .name { font-weight: 700; margin: 0; }
+    .item .desc { color: var(--muted); margin: 2px 0 0; font-size: .9rem; }
+    .item .price { margin-left: auto; font-weight: 800; color: var(--brand); }
+
+    /* overlay */
+    .scrim { position: fixed; inset: 0; background: rgba(20,12,4,.45); opacity: 0; pointer-events: none; transition: opacity .2s ease; z-index: 10; }
+    .scrim.show { opacity: 1; pointer-events: auto; }
+    .sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--card);
+      border-radius: 20px 20px 0 0; box-shadow: 0 -8px 40px rgba(0,0,0,.2); padding: 8px 18px calc(20px + env(safe-area-inset-bottom));
+      transform: translateY(110%); transition: transform .26s cubic-bezier(.2,.8,.2,1); max-width: 480px; margin: 0 auto; max-height: 86vh; overflow: auto; }
+    .sheet.show { transform: translateY(0); }
+    .sheet.second { z-index: 30; }
+    .grip { width: 40px; height: 5px; background: var(--line); border-radius: 999px; margin: 8px auto 12px; }
+    .sheet h2 { margin: 4px 0 2px; }
+    .sheet .price-lg { color: var(--brand); font-weight: 800; font-size: 1.25rem; margin: 0 0 10px; }
+    .sheet p.body { color: #4a4135; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+    button.btn { font: inherit; font-weight: 700; border-radius: 999px; padding: 12px 18px; cursor: pointer; border: 1px solid var(--line); background: #fff; color: var(--ink); transition: transform .08s ease; }
+    button.btn:active { transform: scale(.96); }
+    button.btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; }
+    .close-x { position: sticky; top: 0; float: right; border: 0; background: transparent; font-size: 1.4rem; line-height: 1; color: var(--muted); cursor: pointer; padding: 8px; }
+
+    /* event log */
+    .log { margin-top: 22px; border-top: 1px dashed var(--line); padding-top: 14px; }
+    .log h3 { font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 0 0 8px; }
+    .log ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .8rem; }
+    .log li { color: #6b5d4a; }
+    .log li b { color: var(--brand); }
+    .log .muted { color: var(--muted); }
+
+    @media (prefers-reduced-motion: reduce) { .scrim, .sheet, .item { transition: none; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <p class="kicker">🍽 Saffron &amp; Sage</p>
+      <h1>Digital Menu</h1>
+      <p class="hint">Tap a dish for details. Then press your <b>browser / phone Back button</b> — the detail closes and you stay on the menu.</p>
+      <div class="callout">The Back button, the ✕, the scrim, and <kbd>Esc</kbd> all do the same thing: close the top layer — never eject you from the page.</div>
+    </header>
+
+    <div class="menu" id="menu"></div>
+
+    <section class="log">
+      <h3>History event log</h3>
+      <ul id="log"><li class="muted">— interact above to see pushState / popstate —</li></ul>
+    </section>
+  </div>
+
+  <div class="scrim" id="scrim"></div>
+
+  <script>
+    const DISHES = [
+      { id: 'mezze',  emoji: '🥙', name: 'Mezze Platter',   price: '$14', desc: 'Hummus, baba ganoush, olives, warm pita',
+        body: 'A generous sharing board of house-made dips with charred flatbread. Vegetarian.',
+        ingredients: ['Chickpeas', 'Tahini', 'Eggplant', 'Olive oil', 'Garlic', 'Lemon', 'Pita'] },
+      { id: 'tagine', emoji: '🍲', name: 'Lamb Tagine',     price: '$22', desc: 'Slow-cooked lamb, apricots, almonds',
+        body: 'Tender lamb braised for six hours with warm spices, dried apricots, and toasted almonds. Served with couscous.',
+        ingredients: ['Lamb shoulder', 'Apricots', 'Almonds', 'Cinnamon', 'Cumin', 'Saffron', 'Couscous'] },
+      { id: 'saffron',emoji: '🍚', name: 'Saffron Rice',    price: '$8',  desc: 'Basmati, saffron, caramelized onion',
+        body: 'Fragrant basmati steamed with saffron threads and topped with sweet caramelized onion.',
+        ingredients: ['Basmati rice', 'Saffron', 'Onion', 'Butter', 'Salt'] },
+      { id: 'baklava',emoji: '🍯', name: 'Pistachio Baklava',price: '$9', desc: 'Filo, pistachio, honey syrup',
+        body: 'Layers of crisp filo with ground pistachio, soaked in orange-blossom honey syrup.',
+        ingredients: ['Filo pastry', 'Pistachio', 'Honey', 'Butter', 'Orange blossom'] },
+    ];
+
+    const menuEl = document.getElementById('menu');
+    const scrim  = document.getElementById('scrim');
+    const logEl  = document.getElementById('log');
+
+    // ---- render the menu list ----
+    DISHES.forEach((d) => {
+      const b = document.createElement('button');
+      b.className = 'item';
+      b.innerHTML = `<span class="emoji">${d.emoji}</span>
+        <span><span class="name">${d.name}</span><br><span class="desc">${d.desc}</span></span>
+        <span class="price">${d.price}</span>`;
+      b.addEventListener('click', () => openOverlay('detail', d.id));
+      menuEl.appendChild(b);
+    });
+
+    // ---- overlay state: a stack, top = last ----
+    const stack = []; // { kind: 'detail'|'ingredients', dishId }
+    let firstLog = true;
+
+    function log(msg, kind) {
+      if (firstLog) { logEl.innerHTML = ''; firstLog = false; }
+      const li = document.createElement('li');
+      li.innerHTML = kind ? `<b>${kind}</b> ${msg}` : msg;
+      logEl.prepend(li);
+    }
+
+    function openOverlay(kind, dishId) {
+      const top = stack[stack.length - 1];
+      stack.push({ kind, dishId: dishId ?? top?.dishId });
+      history.pushState({ depth: stack.length, kind }, '');
+      log(`open "${kind}" → depth ${stack.length}`, 'pushState');
+      render();
+    }
+
+    // ✕ / scrim / Esc all mirror the Back button — single source of truth:
+    function dismiss() {
+      if (stack.length) history.back();
+    }
+
+    window.addEventListener('popstate', () => {
+      if (stack.length) {
+        const closed = stack.pop();
+        log(`close "${closed.kind}" → depth ${stack.length}`, 'popstate');
+        render();
+      } else {
+        log('no overlay open → browser navigates (normal Back)', 'popstate');
+      }
+    });
+
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') dismiss(); });
+    scrim.addEventListener('click', dismiss);
+
+    // ---- render overlays from the stack ----
+    function render() {
+      document.querySelectorAll('.sheet').forEach((el) => el.remove());
+      scrim.classList.toggle('show', stack.length > 0);
+
+      stack.forEach((layer, i) => {
+        const d = DISHES.find((x) => x.id === layer.dishId);
+        const sheet = document.createElement('div');
+        sheet.className = 'sheet' + (i > 0 ? ' second' : '');
+        if (layer.kind === 'detail') {
+          sheet.innerHTML = `
+            <button class="close-x" aria-label="Close">✕</button>
+            <div class="grip"></div>
+            <h2>${d.emoji} ${d.name}</h2>
+            <p class="price-lg">${d.price}</p>
+            <p class="body">${d.body}</p>
+            <div class="row">
+              <button class="btn primary" data-act="ingredients">View ingredients →</button>
+              <button class="btn" data-act="close">Close</button>
+            </div>`;
+        } else {
+          sheet.innerHTML = `
+            <button class="close-x" aria-label="Close">✕</button>
+            <div class="grip"></div>
+            <h2>Ingredients</h2>
+            <p class="body">${d.name}</p>
+            <ul>${d.ingredients.map((x) => `<li>${x}</li>`).join('')}</ul>
+            <div class="row"><button class="btn" data-act="close">Back</button></div>`;
+        }
+        document.body.appendChild(sheet);
+        requestAnimationFrame(() => sheet.classList.add('show'));
+
+        sheet.querySelector('.close-x').addEventListener('click', dismiss);
+        sheet.querySelectorAll('[data-act]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const act = btn.getAttribute('data-act');
+            if (act === 'ingredients') openOverlay('ingredients');
+            else dismiss();
+          });
+        });
+      });
+    }
+  </script>
+</body>
+</html>

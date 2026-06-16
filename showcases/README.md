@@ -18,6 +18,7 @@ open showcases/skeleton-loading/index.html      # macOS
 | Demo | Demonstrates | Doc |
 | --- | --- | --- |
 | [`skeleton-loading/`](skeleton-loading/) | Perceived performance: skeleton vs. spinner | [techniques/skeleton-loading](../docs/techniques/skeleton-loading.md) |
+| [`back-friendly-modals/`](back-friendly-modals/) | Back button closes the modal, not the page (History API) | [patterns/back-friendly-modals](../docs/patterns/back-friendly-modals.md) |
 
 ## Conventions
 

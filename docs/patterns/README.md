@@ -7,6 +7,7 @@ Reusable solutions to recurring interaction problems. A pattern describes *what 
 - [Inline form validation](inline-form-validation.md) — validate on blur, with clear adjacent messages.
 - [Empty states](empty-states.md) — turn "nothing here" into onboarding.
 - [Bottom sheets & the thumb zone](bottom-sheet-and-thumb-zone.md) — put primary actions within mobile reach.
+- [Back-friendly modals & overlays](back-friendly-modals.md) — Back/Esc/✕ close the modal, not the page. *(has runnable demo)*
 
 ## Planned
 
