@@ -40,7 +40,7 @@
       overscroll-behavior: contain; touch-action: none; user-select: none; /* drag-to-dismiss; demo content is short so disabling native scroll is fine */ }
     .sheet.show { transform: translateY(0); }
     .sheet.second { z-index: 30; }
-    .sheet.dragging, .drawer.dragging { transition: none; }
+    .sheet.dragging, .drawer.dragging, .drawer-left.dragging, .sheet-top.dragging { transition: none; }
 
     /* side drawer — enters from the right, dismissed by swiping right */
     .drawer { position: fixed; top: 0; right: 0; bottom: 0; z-index: 25; width: min(86vw, 360px);
@@ -49,6 +49,29 @@
       overscroll-behavior: contain; touch-action: none; user-select: none; /* drag-to-dismiss; demo content is short */
       transform: translateX(110%); transition: transform .26s cubic-bezier(.2,.8,.2,1); }
     .drawer.show { transform: translateX(0); }
+
+    /* left drawer — enters from the left, dismissed by swiping left */
+    .drawer-left { position: fixed; top: 0; left: 0; bottom: 0; z-index: 25; width: min(82vw, 320px);
+      background: var(--card); box-shadow: 8px 0 40px rgba(0,0,0,.2);
+      padding: 16px 18px calc(20px + env(safe-area-inset-bottom)); overflow: auto;
+      overscroll-behavior: contain; touch-action: none; user-select: none;
+      transform: translateX(-110%); transition: transform .26s cubic-bezier(.2,.8,.2,1); }
+    .drawer-left.show { transform: translateX(0); }
+
+    /* top sheet — enters from the top, dismissed by swiping up */
+    .sheet-top { position: fixed; top: 0; left: 0; right: 0; z-index: 25; background: var(--card);
+      border-radius: 0 0 20px 20px; box-shadow: 0 8px 40px rgba(0,0,0,.2);
+      padding: calc(12px + env(safe-area-inset-top)) 18px 14px; max-width: 480px; margin: 0 auto; max-height: 70vh; overflow: auto;
+      overscroll-behavior: contain; touch-action: none; user-select: none;
+      transform: translateY(-110%); transition: transform .26s cubic-bezier(.2,.8,.2,1); }
+    .sheet-top.show { transform: translateY(0); }
+    .grip-bottom { width: 40px; height: 5px; background: var(--line); border-radius: 999px; margin: 14px auto 2px; }
+
+    .cat-item { display: block; width: 100%; text-align: left; font: inherit; border: 0; background: transparent;
+      color: var(--ink); padding: 12px 8px; border-radius: 10px; cursor: pointer; border-bottom: 1px solid var(--line); }
+    .cat-item:active { background: var(--bg); }
+    .offer { background: #fff7ed; border: 1px solid #fed7aa; color: #7c2d12; border-radius: 12px; padding: 12px 14px; margin: 8px 0; }
+
     .grip { cursor: grab; }
     .swipe-hint { color: var(--muted); font-size: .8rem; margin: 0 0 12px; }
     .cart-line { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--line); }
@@ -74,7 +97,7 @@
     .log li b { color: var(--brand); }
     .log .muted { color: var(--muted); }
 
-    @media (prefers-reduced-motion: reduce) { .scrim, .sheet, .drawer, .item { transition: none; } }
+    @media (prefers-reduced-motion: reduce) { .scrim, .sheet, .drawer, .drawer-left, .sheet-top, .item { transition: none; } }
   </style>
 </head>
 <body>
@@ -83,8 +106,12 @@
       <p class="kicker">🍽 Saffron &amp; Sage</p>
       <h1>Digital Menu</h1>
       <p class="hint">Tap a dish for details. Then press your <b>browser / phone Back button</b> — the detail closes and you stay on the menu.</p>
-      <div class="callout">Back, ✕, scrim-tap, <kbd>Esc</kbd> — and <b>swipe</b> — all close the top layer. Open the cart and <b>swipe it right</b> to dismiss.</div>
-      <button class="cart-btn" id="cartBtn">🛒 Open cart (drawer)</button>
+      <div class="callout">Overlays can enter from any side — dismiss each by <b>swiping it back the way it came in</b>: bottom sheet ↓, top sheet ↑, left drawer ←, right drawer →. Back / ✕ / scrim / <kbd>Esc</kbd> always close it too.</div>
+      <div class="row" style="margin-top: 12px">
+        <button class="cart-btn" id="catBtn">☰ Categories <small>(left)</small></button>
+        <button class="cart-btn" id="offersBtn">🎉 Offers <small>(top)</small></button>
+        <button class="cart-btn" id="cartBtn">🛒 Cart <small>(right)</small></button>
+      </div>
     </header>
 
     <div class="menu" id="menu"></div>
@@ -127,6 +154,12 @@
       { name: '🍚 Saffron Rice', qty: 2, price: 8 },
       { name: '🍵 Moroccan Mint Tea', qty: 2, price: 5 },
     ];
+    const CATEGORIES = ['Starters', 'Mains', 'Sides', 'Desserts', 'Drinks', 'Vegetarian'];
+    const OFFERS = [
+      '🔥 20% off all mains before 6pm',
+      '🧆 Free falafel side with any wrap',
+      '🍵 Buy 2 mint teas, get 1 free',
+    ];
 
     const menuEl = document.getElementById('menu');
     const scrim  = document.getElementById('scrim');
@@ -144,7 +177,16 @@
     });
 
     // ---- overlay state: a stack, top = last ----
-    const stack = []; // { kind: 'detail'|'ingredients'|'cart', dishId }
+    const stack = []; // { kind: 'detail'|'ingredients'|'cart'|'categories'|'offers', dishId }
+
+    // each overlay kind → which side it enters from + its CSS class
+    const KIND = {
+      detail:      { side: 'bottom', cls: 'sheet' },
+      ingredients: { side: 'bottom', cls: 'sheet' },
+      cart:        { side: 'right',  cls: 'drawer' },
+      categories:  { side: 'left',   cls: 'drawer-left' },
+      offers:      { side: 'top',    cls: 'sheet-top' },
+    };
     let firstLog = true;
 
     function log(msg, kind) {
@@ -180,6 +222,8 @@
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') dismiss(); });
     scrim.addEventListener('click', dismiss);
     document.getElementById('cartBtn').addEventListener('click', () => openOverlay('cart'));
+    document.getElementById('catBtn').addEventListener('click', () => openOverlay('categories'));
+    document.getElementById('offersBtn').addEventListener('click', () => openOverlay('offers'));
 
     // ---- lock background scroll while any overlay is open (iOS-safe, position-fixed + restore) ----
     let scrollLocked = false, savedY = 0;
@@ -205,53 +249,21 @@
     // ---- render overlays from the stack ----
     function render() {
       syncScrollLock();
-      document.querySelectorAll('.sheet, .drawer').forEach((el) => el.remove());
+      document.querySelectorAll('.sheet, .drawer, .drawer-left, .sheet-top').forEach((el) => el.remove());
       scrim.classList.toggle('show', stack.length > 0);
 
       stack.forEach((layer, i) => {
+        const meta = KIND[layer.kind];
         const d = DISHES.find((x) => x.id === layer.dishId);
         const el = document.createElement('div');
-
-        if (layer.kind === 'cart') {
-          el.className = 'drawer';
-          const total = CART.reduce((s, c) => s + c.qty * c.price, 0);
-          el.innerHTML = `
-            <button class="close-x" aria-label="Close">✕</button>
-            <h2>🛒 Your cart</h2>
-            <p class="swipe-hint">← swipe this panel right to close (or ✕ / Esc / Back)</p>
-            ${CART.map((c) => `<div class="cart-line"><span>${c.name} ×${c.qty}</span><span>$${c.qty * c.price}</span></div>`).join('')}
-            <div class="cart-total"><span>Total</span><span>$${total}</span></div>
-            <div class="row"><button class="btn primary" data-act="close" style="flex:1">Checkout</button></div>`;
-        } else {
-          el.className = 'sheet' + (i > 0 ? ' second' : '');
-          if (layer.kind === 'detail') {
-            el.innerHTML = `
-              <button class="close-x" aria-label="Close">✕</button>
-              <div class="grip"></div>
-              <h2>${d.emoji} ${d.name}</h2>
-              <p class="price-lg">${d.price}</p>
-              <p class="body">${d.body}</p>
-              <div class="row">
-                <button class="btn primary" data-act="ingredients">View ingredients →</button>
-                <button class="btn" data-act="close">Close</button>
-              </div>`;
-          } else {
-            el.innerHTML = `
-              <button class="close-x" aria-label="Close">✕</button>
-              <div class="grip"></div>
-              <h2>Ingredients</h2>
-              <p class="body">${d.name}</p>
-              <ul>${d.ingredients.map((x) => `<li>${x}</li>`).join('')}</ul>
-              <div class="row"><button class="btn" data-act="close">Back</button></div>`;
-          }
-        }
+        el.className = meta.cls + (meta.side === 'bottom' && i > 0 ? ' second' : '');
+        el.innerHTML = contentFor(layer.kind, d);
 
         document.body.appendChild(el);
         requestAnimationFrame(() => el.classList.add('show'));
-        // bottom sheets dismiss by swiping DOWN; the right drawer dismisses by swiping RIGHT
-        enableSwipeDismiss(el, layer.kind === 'cart' ? 'x' : 'y');
+        enableSwipeDismiss(el, meta.side); // dismiss by dragging it back the way it entered
 
-        el.querySelector('.close-x').addEventListener('click', dismiss);
+        el.querySelector('.close-x')?.addEventListener('click', dismiss);
         el.querySelectorAll('[data-act]').forEach((btn) => {
           btn.addEventListener('click', () => {
             if (btn.getAttribute('data-act') === 'ingredients') openOverlay('ingredients');
@@ -261,30 +273,82 @@
       });
     }
 
-    // ---- swipe to dismiss in the direction the overlay entered ----
-    // axis 'y' → close by dragging DOWN (bottom sheet); axis 'x' → close by dragging RIGHT (right drawer).
-    function enableSwipeDismiss(panel, axis) {
+    // build the inner HTML for each overlay kind
+    function contentFor(kind, d) {
+      if (kind === 'detail') return `
+        <button class="close-x" aria-label="Close">✕</button>
+        <div class="grip"></div>
+        <h2>${d.emoji} ${d.name}</h2>
+        <p class="price-lg">${d.price}</p>
+        <p class="body">${d.body}</p>
+        <div class="row">
+          <button class="btn primary" data-act="ingredients">View ingredients →</button>
+          <button class="btn" data-act="close">Close</button>
+        </div>`;
+      if (kind === 'ingredients') return `
+        <button class="close-x" aria-label="Close">✕</button>
+        <div class="grip"></div>
+        <h2>Ingredients</h2>
+        <p class="body">${d.name}</p>
+        <ul>${d.ingredients.map((x) => `<li>${x}</li>`).join('')}</ul>
+        <div class="row"><button class="btn" data-act="close">Back</button></div>`;
+      if (kind === 'cart') {
+        const total = CART.reduce((s, c) => s + c.qty * c.price, 0);
+        return `
+          <button class="close-x" aria-label="Close">✕</button>
+          <h2>🛒 Your cart</h2>
+          <p class="swipe-hint">swipe this panel right to close →</p>
+          ${CART.map((c) => `<div class="cart-line"><span>${c.name} ×${c.qty}</span><span>$${c.qty * c.price}</span></div>`).join('')}
+          <div class="cart-total"><span>Total</span><span>$${total}</span></div>
+          <div class="row"><button class="btn primary" data-act="close" style="flex:1">Checkout</button></div>`;
+      }
+      if (kind === 'categories') return `
+        <button class="close-x" aria-label="Close">✕</button>
+        <h2>☰ Categories</h2>
+        <p class="swipe-hint">← swipe this panel left to close</p>
+        ${CATEGORIES.map((c) => `<button class="cat-item" data-act="close">${c}</button>`).join('')}`;
+      if (kind === 'offers') return `
+        <button class="close-x" aria-label="Close">✕</button>
+        <h2>🎉 Today's offers</h2>
+        ${OFFERS.map((o) => `<div class="offer">${o}</div>`).join('')}
+        <p class="swipe-hint" style="text-align:center; margin:.5rem 0 0">swipe up to close ↑</p>
+        <div class="grip-bottom"></div>`;
+      return '';
+    }
+
+    // ---- swipe to dismiss: drag the overlay back the way it entered ----
+    const SIDE = {
+      bottom: { axis: 'y', sign:  1, out: 'translateY(100%)'  }, // swipe DOWN
+      top:    { axis: 'y', sign: -1, out: 'translateY(-100%)' }, // swipe UP
+      right:  { axis: 'x', sign:  1, out: 'translateX(100%)'  }, // swipe RIGHT
+      left:   { axis: 'x', sign: -1, out: 'translateX(-100%)' }, // swipe LEFT
+    };
+    function enableSwipeDismiss(panel, side) {
+      const cfg = SIDE[side];
       let origin = 0, startT = 0, delta = 0, active = false, decided = false;
-      const along = (e) => (axis === 'y' ? e.clientY : e.clientX);
+      const along = (e) => (cfg.axis === 'y' ? e.clientY : e.clientX);
 
       panel.addEventListener('pointerdown', (e) => {
         if (e.button > 0) return;
-        if (e.target.closest('button, a, input, ul')) return; // don't hijack taps on controls/lists
+        if (e.target.closest('button, a, input')) return; // don't hijack taps on controls
         origin = along(e); startT = Date.now(); delta = 0; active = true; decided = false;
       });
 
       panel.addEventListener('pointermove', (e) => {
         if (!active) return;
-        const moved = along(e) - origin;            // positive = the closing direction (down / right)
+        const raw = along(e) - origin;
+        const moved = raw * cfg.sign;                 // positive = the closing direction for this side
         if (!decided) {
-          if (Math.abs(moved) < 6) return;          // wait for intent
-          if (moved <= 0) { active = false; return; } // wrong direction → ignore this gesture
+          if (Math.abs(raw) < 6) return;              // wait for intent
+          if (moved <= 0) { active = false; return; } // wrong direction → leave it alone
           decided = true;
-          panel.setPointerCapture?.(e.pointerId);   // keep tracking even if the finger leaves the panel
+          panel.setPointerCapture?.(e.pointerId);     // keep tracking if the finger leaves the panel
           panel.classList.add('dragging');
         }
         delta = Math.max(0, moved);
-        panel.style.transform = axis === 'y' ? `translateY(${delta}px)` : `translateX(${delta}px)`;
+        panel.style.transform = cfg.axis === 'y'
+          ? `translateY(${cfg.sign * delta}px)`
+          : `translateX(${cfg.sign * delta}px)`;
       });
 
       const end = () => {
@@ -293,14 +357,14 @@
         if (!decided) return;
         decided = false;
         panel.classList.remove('dragging');
-        const size = axis === 'y' ? panel.offsetHeight : panel.offsetWidth;
+        const size = cfg.axis === 'y' ? panel.offsetHeight : panel.offsetWidth;
         const vel = delta / Math.max(1, Date.now() - startT); // px per ms
-        if (delta > size * 0.35 || vel > 0.5) {     // distance OR flick → dismiss
-          panel.style.transform = axis === 'y' ? 'translateY(100%)' : 'translateX(100%)';
-          log(`swipe ${axis === 'y' ? 'down' : 'right'} → dismiss`, 'swipe');
-          setTimeout(dismiss, 180);                 // slide out, then close via the same path as Back/Esc/✕
+        if (delta > size * 0.35 || vel > 0.5) {       // distance OR flick → dismiss
+          panel.style.transform = cfg.out;
+          log(`swipe ${side} → dismiss`, 'swipe');
+          setTimeout(dismiss, 180);                   // slide out, then close via the same path as Back/Esc/✕
         } else {
-          panel.style.transform = '';               // snap back to open
+          panel.style.transform = '';                 // snap back to open
         }
       };
       panel.addEventListener('pointerup', end);

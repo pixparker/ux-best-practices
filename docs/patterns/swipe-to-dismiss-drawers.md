@@ -76,7 +76,7 @@ el.addEventListener('pointerup', () => {
 
 ## Showcase
 
-- 👉 [`showcases/back-friendly-modals/`](../../showcases/back-friendly-modals/) — dish-detail **bottom sheets close by swiping down**, and the **🛒 Cart** drawer (from the right) **closes by swiping right** — both with follow-the-finger drag, a distance/velocity threshold, and snap-back. Every overlay also still closes via ✕ / scrim / Esc / Back. One demo, the full modal family: history-back dismissal + scroll lock + swipe-to-dismiss.
+- 👉 [`showcases/back-friendly-modals/`](../../showcases/back-friendly-modals/) — overlays enter from **all four sides** and each dismisses in the direction it came: dish-detail **bottom sheet → swipe down**, **🎉 Offers top sheet → swipe up**, **☰ Categories left drawer → swipe left**, **🛒 Cart right drawer → swipe right** — all with follow-the-finger drag, a distance/velocity threshold, and snap-back. Every overlay also still closes via ✕ / scrim / Esc / Back. One demo, the full modal family: history-back dismissal + scroll lock + swipe-to-dismiss.
 
 ## Pitfalls & anti-patterns
 
