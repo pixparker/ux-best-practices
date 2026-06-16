@@ -4,12 +4,12 @@ Scannable, actionable lists. The fastest way to reuse hard-won lessons: run the 
 
 ## Checklists
 
+- [New-project UX kickoff](new-project-kickoff.md) — decide archetype, platform, and key flows before designing screens.
 - [Mobile UX checklist](mobile-ux-checklist.md) — run before shipping any mobile-facing screen.
+- [Accessibility (a11y) checklist](accessibility-checklist.md) — keyboard, screen reader, contrast baseline.
 
 ## Planned
 
-- New-project UX kickoff (decide the archetype, platform, key flows)
-- Accessibility (a11y) checklist
 - Performance & perceived-performance checklist
 - Forms & input checklist
 - Pre-launch polish pass

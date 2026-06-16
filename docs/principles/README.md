@@ -5,13 +5,14 @@ The timeless laws behind good UX & UI. These rarely change with trends or stacks
 ## Entries
 
 - [Feedback for every action](feedback-for-every-action.md) — never leave the user wondering if it worked.
+- [Design every state](design-every-state.md) — empty, loading, error, and partial — not just the happy path.
+- [Forgiveness: prefer undo over confirm](forgiveness-undo-over-confirm.md) — make mistakes cheap to recover from.
+- [Visual hierarchy guides the eye](visual-hierarchy.md) — make the most important thing obviously most important.
 
 ## Planned
 
 - Clarity over cleverness
 - Recognition over recall (don't make users remember)
-- Forgiveness — make mistakes cheap to undo
-- Visual hierarchy guides the eye
 - Consistency reduces cognitive load
 - Respect attention — default to calm, not noisy
 - Match the user's mental model

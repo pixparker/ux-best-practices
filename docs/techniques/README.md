@@ -5,12 +5,12 @@ Modern implementation techniques that make an app feel smooth, fast, and alive. 
 ## Entries
 
 - [Skeleton loading](skeleton-loading.md) — show structure instantly instead of a blank spinner. *(has runnable demo)*
+- [Optimistic UI](optimistic-ui.md) — apply the change instantly, reconcile in the background, roll back on failure.
+- [Micro-interactions](micro-interactions.md) — purposeful, sub-300ms motion that confirms actions.
 
 ## Planned
 
-- Optimistic UI (apply the change instantly, reconcile in the background)
 - View Transitions API (smooth route/state morphing)
-- Micro-interactions (purposeful, sub-300ms motion)
 - Prefetching & predictive loading
 - Staggered / entrance animations
 - Haptics & sound (when appropriate)

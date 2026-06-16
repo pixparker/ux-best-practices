@@ -5,11 +5,11 @@ Visual interface best practices — the *look* layer. Good UX can still feel che
 ## Entries
 
 - [Type scale & readability](type-scale-and-readability.md) — a sane typographic system, mobile-first.
+- [Spacing & layout (8-pt grid)](spacing-and-layout.md) — one spacing scale for instant visual rhythm.
+- [Color, contrast & dark mode](color-contrast-and-dark-mode.md) — semantic tokens, WCAG AA, dark as a real theme.
 
 ## Planned
 
-- Color & contrast (WCAG, semantic color, dark mode)
-- Spacing & layout (8pt grid, rhythm, density)
 - Motion & animation (easing, duration, purpose)
 - Iconography (consistency, clarity, labels)
 - Component anatomy (buttons, inputs, cards, modals)

@@ -11,17 +11,27 @@ This repo is organized along two axes — **archetypes** (what you're building) 
 
 ## Principles (why)
 - [Feedback for every action](docs/principles/feedback-for-every-action.md): every action needs an immediate, visible response.
+- [Design every state](docs/principles/design-every-state.md): design empty, loading, error, and partial states — not just the happy path.
+- [Forgiveness: prefer undo over confirm](docs/principles/forgiveness-undo-over-confirm.md): make mistakes cheap to recover from; favor undo over confirm dialogs.
+- [Visual hierarchy guides the eye](docs/principles/visual-hierarchy.md): use size/weight/color/spacing so the most important thing is obviously most important.
 - [Principles index](docs/principles/README.md): timeless UX/UI laws.
 
 ## UI craft (look)
 - [Type scale & readability](docs/ui/type-scale-and-readability.md): a small, consistent type system; body ≥ 16px on mobile.
+- [Spacing & layout (8-pt grid)](docs/ui/spacing-and-layout.md): snap all spacing to one 4/8-based scale for visual rhythm.
+- [Color, contrast & dark mode](docs/ui/color-contrast-and-dark-mode.md): semantic color tokens, WCAG AA contrast, dark mode as its own theme.
 - [UI index](docs/ui/README.md): typography, color, spacing, motion, components.
 
 ## Patterns (behavior)
+- [Inline form validation](docs/patterns/inline-form-validation.md): validate on blur with clear adjacent messages.
+- [Empty states](docs/patterns/empty-states.md): turn empty screens into onboarding; handle first-run vs no-results.
+- [Bottom sheets & the thumb zone](docs/patterns/bottom-sheet-and-thumb-zone.md): place primary mobile actions within thumb reach.
 - [Patterns index](docs/patterns/README.md): reusable solutions to recurring interaction problems.
 
 ## Techniques (feel)
 - [Skeleton loading](docs/techniques/skeleton-loading.md): layout-shaped placeholders beat blank spinners.
+- [Optimistic UI](docs/techniques/optimistic-ui.md): update instantly for high-confidence actions, reconcile/rollback in the background.
+- [Micro-interactions](docs/techniques/micro-interactions.md): purposeful sub-300ms motion; honor prefers-reduced-motion.
 - [Techniques index](docs/techniques/README.md): perceived-performance and smoothness techniques.
 
 ## Archetypes (what you're building)
@@ -37,7 +47,9 @@ This repo is organized along two axes — **archetypes** (what you're building) 
 - [Platforms index](docs/platforms/README.md): mobile web, PWA, desktop, web constraints.
 
 ## Checklists (ship it)
+- [New-project UX kickoff](docs/checklists/new-project-kickoff.md): decide archetype, platform, and key flows before designing screens.
 - [Mobile UX checklist](docs/checklists/mobile-ux-checklist.md): pre-ship pass for mobile screens.
+- [Accessibility (a11y) checklist](docs/checklists/accessibility-checklist.md): keyboard, screen reader, contrast baseline (WCAG AA).
 - [Checklists index](docs/checklists/README.md): actionable lists.
 
 ## Code
