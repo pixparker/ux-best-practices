@@ -8,6 +8,7 @@ Visual interface best practices — the *look* layer. Good UX can still feel che
 - [Spacing & layout (8-pt grid)](spacing-and-layout.md) — one spacing scale for instant visual rhythm.
 - [Color, contrast & dark mode](color-contrast-and-dark-mode.md) — semantic tokens, WCAG AA, dark as a real theme.
 - [Intentional tap & touch feedback](tap-and-touch-feedback.md) — kill the default mobile tap-highlight flash; own your press states, keep focus accessible. *(has runnable demo)*
+- [Full-height sections & the mobile viewport](full-height-and-the-mobile-viewport.md) — the 100vh trap; use static units (svh/lvh) so heroes don't resize mid-scroll. *(has runnable demo)*
 
 ## Planned
 

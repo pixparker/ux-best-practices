@@ -11,6 +11,7 @@ A **platform** is a delivery context. It imposes constraints and conventions ind
 - Tap targets ≥ 44×44px, generous spacing
 - `font-size ≥ 16px` on inputs (avoid iOS zoom-on-focus)
 - Own your touch feedback — kill the default tap-highlight flash — [tap & touch feedback](../ui/tap-and-touch-feedback.md)
+- Full-height sections: `100vh` changes with the address bar — use static units / freeze it — [the 100vh trap](../ui/full-height-and-the-mobile-viewport.md)
 - Safe areas (`env(safe-area-inset-*)`), no hover-only affordances
 - Performance on mid-range devices & flaky networks
 

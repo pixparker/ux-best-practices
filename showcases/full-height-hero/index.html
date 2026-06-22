@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Full-height Hero & the Mobile Viewport — UX Showcase</title>
+  <meta name="description" content="Why 100vh heroes jump on mobile, and how svh/lvh/dvh (or a frozen measurement) fix it." />
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #1b2330; background: #f4f7fa; -webkit-font-smoothing: antialiased; }
+
+    .hero { position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center;
+      text-align: center; padding: 24px; color: #fff; gap: 14px;
+      background: linear-gradient(160deg, #312e81, #0f172a 55%, #4338ca);
+      height: 100vh; /* default — overridden by the unit class below */ }
+    .hero.u-vh  { height: 100vh; }
+    .hero.u-svh { height: 100svh; }
+    .hero.u-lvh { height: 100lvh; }
+    .hero.u-dvh { height: 100dvh; }
+    .hero.u-js  { height: var(--app-h, 100vh); }
+
+    .hero h1 { font-size: clamp(1.6rem, 6vw, 2.4rem); margin: 0; letter-spacing: -.02em; }
+    .hero p.lead { margin: 0; opacity: .85; max-width: 32ch; }
+    .scrollcue { position: absolute; bottom: 18px; left: 0; right: 0; text-align: center; opacity: .8; font-size: .85rem; }
+
+    /* unit switcher */
+    .seg { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+    .seg button { border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.08); color: #fff;
+      padding: 9px 13px; font: inherit; font-weight: 700; border-radius: 999px; cursor: pointer;
+      -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; }
+    .seg button[aria-pressed="true"] { background: #fff; color: #1e1b4b; border-color: #fff; }
+    .note { font-size: .82rem; opacity: .8; max-width: 34ch; }
+
+    /* live readout, always visible while scrolling */
+    .hud { position: fixed; left: 12px; right: 12px; bottom: max(12px, env(safe-area-inset-bottom));
+      margin: 0 auto; max-width: 460px; background: rgba(15,23,42,.92); color: #e8edf3; z-index: 50;
+      border-radius: 12px; padding: 10px 14px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .8rem;
+      box-shadow: 0 8px 30px rgba(0,0,0,.3); display: grid; gap: 3px; }
+    .hud b { color: #fbbf24; }
+    .hud .ok { color: #34d399; }
+    .hud .warn { color: #fb7185; }
+
+    .content { max-width: 560px; margin: 0 auto; padding: 28px 18px 120px; }
+    .content h2 { margin: 0 0 6px; }
+    .content section { background: #fff; border: 1px solid #e6ebf1; border-radius: 14px; padding: 18px; margin: 14px 0;
+      box-shadow: 0 1px 2px rgba(16,24,40,.05); }
+    .content p { color: #4a5568; }
+    kbd { background: #eef2f7; border: 1px solid #d7dee8; border-radius: 5px; padding: 1px 5px; font-size: .85em; }
+
+    @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+  </style>
+</head>
+<body>
+  <header class="hero u-vh" id="hero">
+    <h1>🌙 Luna Lounge</h1>
+    <p class="lead">A full-height hero. On a phone, scroll so the address bar collapses — then watch the readout.</p>
+
+    <div class="seg" role="group" aria-label="Height unit">
+      <button data-u="vh"  aria-pressed="true">100vh</button>
+      <button data-u="svh" aria-pressed="false">100svh</button>
+      <button data-u="lvh" aria-pressed="false">100lvh</button>
+      <button data-u="dvh" aria-pressed="false">100dvh</button>
+      <button data-u="js"  aria-pressed="false">JS-frozen</button>
+    </div>
+    <p class="note" id="note">100vh ≈ large viewport — static, but the bottom may hide behind the address bar on first paint.</p>
+
+    <div class="scrollcue">↓ scroll down</div>
+  </header>
+
+  <main class="content">
+    <section><h2>What you're testing</h2><p>The hero above is sized with the selected unit. As the mobile address bar shows/hides, the visible viewport height changes. A <b>dynamic</b> unit (<code>dvh</code>) resizes the hero live — which shifts everything below and makes your scroll <b>jump</b>. A <b>static</b> unit (<code>svh</code>/<code>lvh</code>) or a frozen measurement holds steady.</p></section>
+    <section><h2>Try this on your phone</h2><p>1) Pick <kbd>100dvh</kbd>, scroll up and down — note the hero height number changing in the readout. 2) Switch to <kbd>100svh</kbd> and do the same — the hero height stays put. That stability is the whole point.</p></section>
+    <section><h2>Recommendation</h2><p>Default to <code>min-height: 100svh</code> with a <code>100vh</code> fallback for full-height sections. Reserve <code>dvh</code> for small UI (e.g. a sticky bottom bar), not large heroes.</p></section>
+  </main>
+
+  <div class="hud" id="hud" aria-live="polite">
+    <div>unit <b id="hUnit">100vh</b> · supported: <span id="hSupp"></span></div>
+    <div>window.innerHeight <b id="hWin">–</b>px · hero <b id="hHero">–</b>px</div>
+    <div id="hStatus" class="ok">stable</div>
+  </div>
+
+  <script>
+    const hero = document.getElementById('hero');
+    const buttons = [...document.querySelectorAll('.seg button')];
+    const note = document.getElementById('note');
+    const hUnit = document.getElementById('hUnit');
+    const hWin = document.getElementById('hWin');
+    const hHero = document.getElementById('hHero');
+    const hStatus = document.getElementById('hStatus');
+    const hSupp = document.getElementById('hSupp');
+
+    const NOTES = {
+      vh:  '100vh ≈ large viewport — static, but the bottom may hide behind the address bar on first paint.',
+      svh: '100svh = small viewport (bar shown). Fits without cut-off and never grows → no jump. Recommended default.',
+      lvh: '100lvh = large viewport (bar hidden). Fills the screen, but bottom can hide behind the bar initially.',
+      dvh: '100dvh = dynamic. Tracks the live viewport, so it RESIZES as the bar shows/hides → the scroll jump.',
+      js:  'JS-frozen: innerHeight measured once on load into --app-h, never updated on scroll. The classic fix.',
+    };
+
+    // measure-once-and-freeze (the "calculate then don't change" approach)
+    function setAppHeight() {
+      document.documentElement.style.setProperty('--app-h', window.innerHeight + 'px');
+    }
+    setAppHeight();
+    window.addEventListener('orientationchange', () => setTimeout(setAppHeight, 200));
+
+    let baseline = 0; // hero height captured right after a unit is chosen
+
+    function pick(u) {
+      hero.className = 'hero u-' + u;
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.u === u)));
+      note.textContent = NOTES[u];
+      hUnit.textContent = u === 'js' ? 'JS-frozen' : '100' + u;
+      const supported = u === 'js' ? true : (window.CSS && CSS.supports('height', '100' + u));
+      hSupp.textContent = supported ? 'yes' : 'no (falls back)';
+      requestAnimationFrame(() => { baseline = hero.offsetHeight; update(); });
+    }
+
+    function update() {
+      const win = window.innerHeight;
+      const h = hero.offsetHeight;
+      hWin.textContent = win;
+      hHero.textContent = h;
+      const changed = Math.abs(h - baseline) > 2;
+      hStatus.className = changed ? 'warn' : 'ok';
+      hStatus.textContent = changed
+        ? '⚠ hero resized ' + baseline + '→' + h + 'px (this is the jump)'
+        : 'stable — hero height unchanged since selected';
+    }
+
+    buttons.forEach((b) => b.addEventListener('click', () => pick(b.dataset.u)));
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    pick('vh');
+  </script>
+</body>
+</html>

@@ -21,6 +21,7 @@ This repo is organized along two axes — **archetypes** (what you're building) 
 - [Spacing & layout (8-pt grid)](docs/ui/spacing-and-layout.md): snap all spacing to one 4/8-based scale for visual rhythm.
 - [Color, contrast & dark mode](docs/ui/color-contrast-and-dark-mode.md): semantic color tokens, WCAG AA contrast, dark mode as its own theme.
 - [Intentional tap & touch feedback](docs/ui/tap-and-touch-feedback.md): remove the default mobile tap-highlight flash (-webkit-tap-highlight-color), add your own :active feedback, keep :focus-visible for keyboard users.
+- [Full-height sections & the mobile viewport](docs/ui/full-height-and-the-mobile-viewport.md): 100vh on mobile changes as the address bar shows/hides; size full-height heroes with a static unit (100svh recommended, fallback 100vh) or a frozen innerHeight measurement, and avoid 100dvh for big sections to prevent the mid-scroll resize/jump.
 - [UI index](docs/ui/README.md): typography, color, spacing, motion, components.
 
 ## Patterns (behavior)
