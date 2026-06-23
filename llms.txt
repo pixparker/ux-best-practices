@@ -14,6 +14,7 @@ This repo is organized along two axes — **archetypes** (what you're building) 
 - [Design every state](docs/principles/design-every-state.md): design empty, loading, error, and partial states — not just the happy path.
 - [Forgiveness: prefer undo over confirm](docs/principles/forgiveness-undo-over-confirm.md): make mistakes cheap to recover from; favor undo over confirm dialogs.
 - [Visual hierarchy guides the eye](docs/principles/visual-hierarchy.md): use size/weight/color/spacing so the most important thing is obviously most important.
+- [A reload lands on the main content](docs/principles/reload-returns-to-main-content.md): a page refresh should resolve to the main/meaningful content; keep ephemeral overlays (modals/drawers/toasts) out of the URL so reload clears them, and give only shareable destinations (filtered views, item pages) a URL.
 - [Principles index](docs/principles/README.md): timeless UX/UI laws.
 
 ## UI craft (look)
@@ -31,6 +32,8 @@ This repo is organized along two axes — **archetypes** (what you're building) 
 - [Back-friendly modals & overlays](docs/patterns/back-friendly-modals.md): hook overlays into browser history so Back/Esc/scrim/✕ close the modal instead of unloading the page.
 - [Lock background scroll when a modal is open](docs/patterns/lock-scroll-when-modal-open.md): freeze the page behind an open overlay (overscroll-behavior + position-fixed), keep the modal scrollable, restore scroll position on close.
 - [Swipe to dismiss (drawers & sheets)](docs/patterns/swipe-to-dismiss-drawers.md): dismiss an overlay by swiping it back the way it entered (right drawer→swipe right, bottom sheet→swipe down); follow-finger drag with distance/velocity threshold, always keep button/Back/Esc closers too.
+- [Preview-first: quick modal over full-page navigation](docs/patterns/preview-modal-over-full-page.md): in ops/admin grids, open a fast preview modal with quick actions on row click and preserve list filters/sort/scroll; escalate to a full page only for heavy work, so users never lose their place.
+- [Responsive tables on mobile](docs/patterns/responsive-tables-on-mobile.md): reflow data tables into labelled cards (label:value) on narrow screens (or prioritize columns / sticky-column scroll / row-to-preview) so rich rows aren't clipped by cell borders.
 - [Patterns index](docs/patterns/README.md): reusable solutions to recurring interaction problems.
 
 ## Techniques (feel)

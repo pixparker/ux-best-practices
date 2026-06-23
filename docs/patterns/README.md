@@ -10,6 +10,8 @@ Reusable solutions to recurring interaction problems. A pattern describes *what 
 - [Back-friendly modals & overlays](back-friendly-modals.md) — Back/Esc/✕ close the modal, not the page. *(has runnable demo)*
 - [Lock background scroll when a modal is open](lock-scroll-when-modal-open.md) — freeze the page behind an overlay, restore position on close. *(has runnable demo)*
 - [Swipe to dismiss (drawers & sheets)](swipe-to-dismiss-drawers.md) — dismiss an overlay in the direction it entered. *(has runnable demo)*
+- [Preview-first: quick modal over full-page navigation](preview-modal-over-full-page.md) — ops grids: preview + quick actions on click, escalate only when heavy, never lose the list. *(has runnable demo)*
+- [Responsive tables on mobile](responsive-tables-on-mobile.md) — reflow rows into labelled cards so data isn't clipped by borders. *(has runnable demo)*
 
 ## Planned
 

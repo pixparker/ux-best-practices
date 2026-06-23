@@ -8,6 +8,7 @@ The timeless laws behind good UX & UI. These rarely change with trends or stacks
 - [Design every state](design-every-state.md) — empty, loading, error, and partial — not just the happy path.
 - [Forgiveness: prefer undo over confirm](forgiveness-undo-over-confirm.md) — make mistakes cheap to recover from.
 - [Visual hierarchy guides the eye](visual-hierarchy.md) — make the most important thing obviously most important.
+- [A reload lands on the main content](reload-returns-to-main-content.md) — refresh returns the user to the main view, never stuck in an overlay or transient state.
 
 ## Planned
 

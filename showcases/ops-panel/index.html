@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Ops Panel — Preview-first & Responsive Tables — UX Showcase</title>
+  <meta name="description" content="Click a row for a fast preview modal with quick actions; escalate to a full page only when needed; the filtered list never loses its place. Tables become cards on mobile." />
+  <style>
+    :root {
+      --bg:#f6f8fb; --card:#fff; --ink:#1b2330; --muted:#6b7689; --line:#e6ebf1;
+      --brand:#4f46e5; --radius:12px; --shadow:0 1px 2px rgba(16,24,40,.06),0 10px 28px rgba(16,24,40,.08);
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      color:var(--ink); background:var(--bg); -webkit-font-smoothing:antialiased; }
+    .wrap { max-width:880px; margin:0 auto; padding:max(14px,env(safe-area-inset-top)) 14px 60px; }
+    h1 { font-size:1.35rem; margin:18px 2px 2px; }
+    p.sub { color:var(--muted); margin:0 2px 14px; font-size:.92rem; }
+
+    /* toolbar */
+    .toolbar { position:sticky; top:0; z-index:5; background:var(--bg); padding:8px 0 10px; }
+    .filters { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+    .search { flex:1; min-width:160px; border:1px solid var(--line); border-radius:999px; padding:9px 14px; font:inherit; background:var(--card);
+      -webkit-tap-highlight-color:transparent; }
+    .chips { display:flex; gap:6px; flex-wrap:wrap; }
+    .chip { border:1px solid var(--line); background:var(--card); color:var(--ink); border-radius:999px; padding:8px 13px; font:inherit; font-weight:600; cursor:pointer;
+      -webkit-tap-highlight-color:transparent; touch-action:manipulation; user-select:none; }
+    .chip[aria-pressed="true"] { background:var(--ink); color:#fff; border-color:var(--ink); }
+    .ctx { color:var(--muted); font-size:.8rem; margin:8px 2px 0; font-family:ui-monospace,Menlo,monospace; }
+    .kbd-hint { color:var(--muted); font-size:.78rem; margin:2px 2px 0; }
+
+    /* table → cards */
+    table { width:100%; border-collapse:separate; border-spacing:0; margin-top:12px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); }
+    thead th { text-align:left; font-size:.74rem; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); padding:11px 14px; border-bottom:1px solid var(--line); }
+    tbody td { padding:13px 14px; border-bottom:1px solid var(--line); }
+    tbody tr { cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    tbody tr:last-child td { border-bottom:0; }
+    tbody tr:hover { background:#f9fafe; }
+    tbody tr.sel { background:#eef2ff; box-shadow:inset 3px 0 0 var(--brand); }
+    td.chev { text-align:right; color:var(--muted); font-size:1.2rem; width:1%; }
+    .badge { display:inline-block; font-size:.76rem; font-weight:700; padding:3px 9px; border-radius:999px; }
+    .badge.pending { background:#fef3c7; color:#92400e; }
+    .badge.paid { background:#dcfce7; color:#166534; }
+    .badge.refunded { background:#e5e7eb; color:#374151; }
+    .empty { text-align:center; color:var(--muted); padding:34px; }
+
+    /* responsive: become cards so nothing is clipped by borders */
+    @media (max-width:640px) {
+      thead { display:none; }
+      table, tbody, tr, td { display:block; width:100%; }
+      table { border:0; background:transparent; box-shadow:none; }
+      tbody tr { background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:10px; padding:6px 4px; position:relative; }
+      tbody tr.sel { box-shadow:var(--shadow), inset 3px 0 0 var(--brand); }
+      tbody td { border:0; padding:7px 14px; display:flex; justify-content:space-between; gap:14px; }
+      tbody td::before { content:attr(data-label); color:var(--muted); font-weight:600; font-size:.82rem; }
+      td.chev { position:absolute; top:12px; right:12px; padding:0; }
+      td.chev::before { content:''; }
+    }
+
+    /* overlays */
+    .scrim { position:fixed; inset:0; background:rgba(15,23,42,.45); opacity:0; pointer-events:none; transition:opacity .2s ease; z-index:20; }
+    .scrim.show { opacity:1; pointer-events:auto; }
+
+    .preview { position:fixed; z-index:30; background:var(--card); box-shadow:0 20px 60px rgba(0,0,0,.25); overflow:auto;
+      transition:transform .24s cubic-bezier(.2,.8,.2,1); }
+    /* desktop: centered dialog */
+    @media (min-width:641px) {
+      .preview { top:50%; left:50%; width:min(94vw,460px); max-height:86vh; border-radius:16px; padding:18px 20px 20px; transform:translate(-50%,-46%); opacity:0; }
+      .preview.show { transform:translate(-50%,-50%); opacity:1; }
+    }
+    /* mobile: bottom sheet */
+    @media (max-width:640px) {
+      .preview { left:0; right:0; bottom:0; border-radius:18px 18px 0 0; padding:8px 18px calc(18px + env(safe-area-inset-bottom)); max-height:88vh; transform:translateY(110%); }
+      .preview.show { transform:translateY(0); }
+    }
+    .grip { width:40px; height:5px; background:var(--line); border-radius:999px; margin:6px auto 12px; }
+    @media (min-width:641px){ .grip{ display:none; } }
+    .pv-top { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px; }
+    .pv-nav, .pv-win { display:flex; gap:6px; }
+    .iconbtn { width:36px; height:36px; border:1px solid var(--line); background:#fff; color:var(--ink); border-radius:10px; font-size:1.15rem; line-height:1;
+      display:inline-flex; align-items:center; justify-content:center; cursor:pointer; -webkit-tap-highlight-color:transparent; touch-action:manipulation; transition:transform .08s ease; }
+    .iconbtn:active { transform:scale(.94); }
+    .iconbtn:disabled { opacity:.4; cursor:default; }
+    .iconbtn svg { width:18px; height:18px; }
+    .pv-head { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+    .pv-id { font-weight:800; font-size:1.1rem; }
+    .pv-cust { color:var(--muted); }
+    .pv-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:16px 0; }
+    .pv-grid > div { background:var(--bg); border-radius:10px; padding:10px 12px; }
+    .pv-grid span { display:block; color:var(--muted); font-size:.76rem; }
+    .pv-grid b { font-size:.98rem; }
+    .pv-cta { position:sticky; bottom:0; background:var(--card); display:flex; flex-wrap:wrap; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--line); }
+    .pv-cta .btn { flex:1; min-width:120px; }
+    .btn { font:inherit; font-weight:700; border:1px solid var(--line); background:#fff; color:var(--ink); border-radius:999px; padding:10px 15px; cursor:pointer;
+      -webkit-tap-highlight-color:transparent; touch-action:manipulation; transition:transform .08s ease; }
+    .btn:active { transform:scale(.96); }
+    .btn.primary { background:var(--brand); border-color:var(--brand); color:#fff; }
+    .btn.ghost { background:transparent; }
+    .btn.danger { color:#b42318; border-color:#fecdca; }
+
+    /* full view = the "open full page" escalation */
+    .full { position:fixed; inset:0; z-index:40; background:var(--bg); overflow:auto; transform:translateX(100%); transition:transform .26s cubic-bezier(.2,.8,.2,1); }
+    .full.show { transform:translateX(0); }
+    .full .bar { position:sticky; top:0; background:var(--card); border-bottom:1px solid var(--line); padding:12px 16px; display:flex; align-items:center; gap:10px; }
+    .full .body { max-width:680px; margin:0 auto; padding:20px 16px 60px; }
+    .full h2 { margin:6px 0; }
+    .line { display:flex; justify-content:space-between; padding:11px 0; border-bottom:1px solid var(--line); }
+
+    .toast { position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(20px); background:var(--ink); color:#fff; padding:10px 16px; border-radius:999px; font-size:.86rem; z-index:60; opacity:0; transition:opacity .2s,transform .2s; pointer-events:none; }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Orders <span style="color:var(--muted);font-weight:500">· Ops panel</span></h1>
+    <p class="sub">Click a row → fast <b>preview</b> with quick actions. Need more? <b>Open full view</b>. Either way, your filter &amp; place in the list are never lost.</p>
+
+    <div class="toolbar">
+      <div class="filters">
+        <input class="search" id="search" type="search" placeholder="Search order # or customer…" />
+        <div class="chips" id="chips" role="group" aria-label="Status filter">
+          <button class="chip" data-s="All" aria-pressed="true">All</button>
+          <button class="chip" data-s="Pending" aria-pressed="false">Pending</button>
+          <button class="chip" data-s="Paid" aria-pressed="false">Paid</button>
+          <button class="chip" data-s="Refunded" aria-pressed="false">Refunded</button>
+        </div>
+      </div>
+      <p class="ctx" id="ctx">—</p>
+      <p class="kbd-hint">⌨ ↑/↓ select · Enter preview · ←/→ prev/next · Esc close · (state is preserved across all of it)</p>
+      <p class="kbd-hint">↻ Reload with a <b>preview</b> open → back to the list (ephemeral). Reload while <b>enlarged</b> (full view) → that item is restored, because it has its own URL (<code>?item=…</code>). That's the reload principle.</p>
+    </div>
+
+    <table>
+      <thead>
+        <tr><th>Order</th><th>Customer</th><th>Status</th><th>Total</th><th>Date</th><th></th></tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="scrim" id="scrim"></div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const ORDERS = [
+      { id:'#1042', customer:'Aria Mostafavi', email:'aria@example.com', status:'Pending',  total:128, date:'Jun 14', items:[{n:'Widget Pro',q:2,p:49},{n:'Sticker pack',q:1,p:30}] },
+      { id:'#1041', customer:'Liam Carter',     email:'liam@example.com', status:'Paid',     total:54,  date:'Jun 14', items:[{n:'Mug',q:3,p:18}] },
+      { id:'#1040', customer:'Sofia Rossi',     email:'sofia@example.com',status:'Pending',  total:312, date:'Jun 13', items:[{n:'Chair',q:1,p:312}] },
+      { id:'#1039', customer:'Noah Kim',        email:'noah@example.com', status:'Refunded', total:22,  date:'Jun 13', items:[{n:'Cable',q:2,p:11}] },
+      { id:'#1038', customer:'Emma Becker',     email:'emma@example.com', status:'Paid',     total:199, date:'Jun 12', items:[{n:'Lamp',q:1,p:199}] },
+      { id:'#1037', customer:'Yusuf Demir',     email:'yusuf@example.com',status:'Pending',  total:75,  date:'Jun 12', items:[{n:'Notebook',q:5,p:15}] },
+      { id:'#1036', customer:'Mia Johansson',   email:'mia@example.com',  status:'Paid',     total:430, date:'Jun 11', items:[{n:'Desk',q:1,p:430}] },
+      { id:'#1035', customer:'Omar Haddad',     email:'omar@example.com', status:'Paid',     total:60,  date:'Jun 11', items:[{n:'Plant',q:2,p:30}] },
+      { id:'#1034', customer:'Chloe Martin',    email:'chloe@example.com',status:'Refunded', total:88,  date:'Jun 10', items:[{n:'Bag',q:1,p:88}] },
+      { id:'#1033', customer:'Ethan Wright',    email:'ethan@example.com',status:'Pending',  total:140, date:'Jun 10', items:[{n:'Headset',q:1,p:140}] },
+      { id:'#1032', customer:'Layla Ahmadi',    email:'layla@example.com',status:'Paid',     total:25,  date:'Jun 09', items:[{n:'Pen set',q:1,p:25}] },
+      { id:'#1031', customer:'Lucas Silva',     email:'lucas@example.com',status:'Pending',  total:510, date:'Jun 09', items:[{n:'Monitor',q:1,p:510}] },
+    ];
+
+    const tbody = document.getElementById('tbody');
+    const ctx = document.getElementById('ctx');
+    const scrim = document.getElementById('scrim');
+    const toastEl = document.getElementById('toast');
+    const MAXIMIZE_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
+
+    // --- persistent list state (the whole point: never reset by opening overlays) ---
+    let statusFilter = 'All';
+    let query = '';
+    let selIndex = 0;
+
+    function filtered() {
+      const q = query.trim().toLowerCase();
+      return ORDERS.filter(o =>
+        (statusFilter === 'All' || o.status === statusFilter) &&
+        (o.customer.toLowerCase().includes(q) || o.id.toLowerCase().includes(q))
+      );
+    }
+
+    function renderList() {
+      const list = filtered();
+      if (selIndex >= list.length) selIndex = Math.max(0, list.length - 1);
+      tbody.innerHTML = list.length ? list.map((o, i) => `
+        <tr data-id="${o.id}" class="${i === selIndex ? 'sel' : ''}">
+          <td data-label="Order"><b>${o.id}</b></td>
+          <td data-label="Customer">${o.customer}</td>
+          <td data-label="Status"><span class="badge ${o.status.toLowerCase()}">${o.status}</span></td>
+          <td data-label="Total">$${o.total}</td>
+          <td data-label="Date">${o.date}</td>
+          <td class="chev">›</td>
+        </tr>`).join('') : `<tr><td class="empty">No orders match this filter.</td></tr>`;
+      tbody.querySelectorAll('tr[data-id]').forEach((tr) => {
+        tr.addEventListener('click', () => { selIndex = list.findIndex(o => o.id === tr.dataset.id); open('preview', tr.dataset.id); });
+      });
+      updateCtx(list.length);
+    }
+
+    function updateCtx(n) {
+      ctx.textContent = `filter: ${statusFilter} · search: "${query || ''}" · ${n} result(s) · scrollY: ${Math.round(savedOrCurrentY())}px  ← preserved while you preview`;
+    }
+    function savedOrCurrentY() { return locked ? savedY : window.scrollY; }
+
+    // --- overlay stack (preview can escalate to full; Back peels one layer) ---
+    const stack = []; // { mode:'preview'|'full', id }
+    const peek = () => stack[stack.length - 1] || null;
+    const orderById = (id) => ORDERS.find(o => o.id === id);
+
+    function open(mode, id) {
+      const item = id ?? peek()?.id;
+      stack.push({ mode, id: item });
+      // FULL view is a real destination → put it in the URL so a reload restores it.
+      // PREVIEW is ephemeral → keep the base URL so a reload returns to the list.
+      const url = mode === 'full' ? ('?item=' + encodeURIComponent(item.replace('#', ''))) : location.pathname;
+      history.pushState({ d: stack.length, mode, id: item }, '', url);
+      render();
+    }
+    function dismiss() {
+      if (!stack.length) return;
+      if (peek().restored) {                 // reload-restored full view: nothing in-app to pop back to
+        stack.pop();
+        history.replaceState({}, '', location.pathname);
+        render();
+      } else {
+        history.back();
+      }
+    }
+    window.addEventListener('popstate', () => { if (stack.length) { stack.pop(); render(); } });
+    document.addEventListener('keydown', onKey);
+    scrim.addEventListener('click', dismiss);
+
+    // scroll lock while any overlay is open
+    let locked = false, savedY = 0;
+    function syncLock() {
+      const should = stack.length > 0;
+      if (should && !locked) { savedY = window.scrollY; document.body.style.cssText = `position:fixed;top:${-savedY}px;width:100%`; locked = true; }
+      else if (!should && locked) { document.body.style.cssText = ''; window.scrollTo(0, savedY); locked = false; }
+    }
+
+    function actionsHtml(o) {
+      if (o.status === 'Pending') return `<button class="btn primary" data-do="Paid">Mark paid</button><button class="btn danger" data-do="Refunded">Cancel</button>`;
+      if (o.status === 'Paid') return `<button class="btn danger" data-do="Refunded">Refund</button>`;
+      return `<button class="btn" data-do="Pending">Reopen</button>`;
+    }
+
+    function render() {
+      syncLock();
+      document.querySelectorAll('.preview, .full').forEach(el => el.remove());
+      scrim.classList.toggle('show', stack.some(s => s.mode === 'preview'));
+
+      stack.forEach((layer) => {
+        const o = orderById(layer.id);
+        if (layer.mode === 'preview') {
+          const el = document.createElement('div'); el.className = 'preview';
+          el.innerHTML = `
+            <div class="grip"></div>
+            <div class="pv-top">
+              <div class="pv-nav">
+                <button class="iconbtn" data-nav="prev" aria-label="Previous item">‹</button>
+                <button class="iconbtn" data-nav="next" aria-label="Next item">›</button>
+              </div>
+              <div class="pv-win">
+                <button class="iconbtn" data-full="1" aria-label="Open full view" title="Open full view">${MAXIMIZE_SVG}</button>
+                <button class="iconbtn" data-close="1" aria-label="Close">✕</button>
+              </div>
+            </div>
+            <div class="pv-head">
+              <div><div class="pv-id">${o.id}</div><div class="pv-cust">${o.customer}</div></div>
+              <span class="badge ${o.status.toLowerCase()}">${o.status}</span>
+            </div>
+            <div class="pv-grid">
+              <div><span>Total</span><b>$${o.total}</b></div>
+              <div><span>Items</span><b>${o.items.length}</b></div>
+              <div><span>Date</span><b>${o.date}</b></div>
+              <div><span>Email</span><b>${o.email}</b></div>
+            </div>
+            <div class="pv-cta">${actionsHtml(o)}</div>`;
+          document.body.appendChild(el);
+          requestAnimationFrame(() => el.classList.add('show'));
+          el.querySelector('[data-close]').addEventListener('click', dismiss);
+          el.querySelectorAll('[data-do]').forEach(b => b.addEventListener('click', () => quickAction(o, b.dataset.do)));
+          el.querySelectorAll('[data-nav]').forEach(b => b.addEventListener('click', () => navItem(b.dataset.nav)));
+          el.querySelector('[data-full]').addEventListener('click', () => open('full', o.id));
+        } else {
+          const el = document.createElement('div'); el.className = 'full';
+          el.innerHTML = `
+            <div class="bar"><button class="btn ghost" data-back="1">← Back</button><b>${o.id} · ${o.customer}</b></div>
+            <div class="body">
+              <h2>Order ${o.id}</h2>
+              <p style="color:var(--muted)">${o.customer} · ${o.email} · ${o.date}</p>
+              <span class="badge ${o.status.toLowerCase()}">${o.status}</span>
+              <h3 style="margin-top:22px">Items</h3>
+              ${o.items.map(it => `<div class="line"><span>${it.n} × ${it.q}</span><b>$${it.p * it.q}</b></div>`).join('')}
+              <div class="line"><b>Total</b><b>$${o.total}</b></div>
+              <p style="color:var(--muted);margin-top:24px">This is the heavy, full-page view — reserved for real work. Press <b>Back</b> to return to the preview, then to the exact filtered list you left.</p>
+            </div>`;
+          document.body.appendChild(el);
+          requestAnimationFrame(() => el.classList.add('show'));
+          el.querySelector('[data-back]').addEventListener('click', dismiss);
+        }
+      });
+    }
+
+    function quickAction(o, newStatus) {
+      o.status = newStatus;               // optimistic, no navigation, list stays put
+      renderList(); render();
+      toast(`${o.id} → ${newStatus}`);
+    }
+
+    function navItem(dir) {
+      const list = filtered();
+      let i = list.findIndex(x => x.id === peek().id);
+      i = dir === 'next' ? Math.min(list.length - 1, i + 1) : Math.max(0, i - 1);
+      selIndex = i;
+      peek().id = list[i].id;              // swap the previewed item without touching history
+      renderList(); render();
+    }
+
+    function onKey(e) {
+      if (stack.length) {
+        if (e.key === 'Escape') dismiss();
+        else if (peek().mode === 'preview' && (e.key === 'ArrowRight' || e.key === 'j')) navItem('next');
+        else if (peek().mode === 'preview' && (e.key === 'ArrowLeft' || e.key === 'k')) navItem('prev');
+        return;
+      }
+      const list = filtered();
+      if (e.key === 'ArrowDown') { e.preventDefault(); selIndex = Math.min(list.length - 1, selIndex + 1); renderList(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); selIndex = Math.max(0, selIndex - 1); renderList(); }
+      else if (e.key === 'Enter' && list[selIndex]) open('preview', list[selIndex].id);
+    }
+
+    let toastT;
+    function toast(msg) {
+      toastEl.textContent = msg; toastEl.classList.add('show');
+      clearTimeout(toastT); toastT = setTimeout(() => toastEl.classList.remove('show'), 1600);
+    }
+
+    // filter wiring
+    document.getElementById('search').addEventListener('input', (e) => { query = e.target.value; selIndex = 0; renderList(); });
+    document.getElementById('chips').addEventListener('click', (e) => {
+      const b = e.target.closest('.chip'); if (!b) return;
+      statusFilter = b.dataset.s; selIndex = 0;
+      document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', String(c === b)));
+      renderList();
+    });
+    window.addEventListener('scroll', () => { if (!stack.length) updateCtx(filtered().length); }, { passive: true });
+
+    renderList();
+
+    // reload / deep-link restore: if the URL points at a full-view item, reopen it (the reload principle).
+    (function restoreFromUrl() {
+      const param = new URLSearchParams(location.search).get('item');
+      if (!param) return;                       // no ?item → ephemeral previews stay closed; show the list
+      const o = orderById('#' + param);
+      if (!o) { history.replaceState({}, '', location.pathname); return; }
+      stack.push({ mode: 'full', id: o.id, restored: true });
+      render();
+    })();
+  </script>
+</body>
+</html>

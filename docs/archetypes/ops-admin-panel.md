@@ -7,6 +7,8 @@ platforms: [desktop, web]
 archetypes: [ops-panel]
 status: draft
 related:
+  - ../patterns/preview-modal-over-full-page.md
+  - ../patterns/responsive-tables-on-mobile.md
   - ../patterns/README.md
   - consumer-mobile-app.md
 last_updated: 2026-06-16
@@ -47,6 +49,8 @@ This is the mirror image of the [consumer mobile app](consumer-mobile-app.md): t
 
 ## Patterns that matter most here
 
+- **[Preview-first over full-page navigation](../patterns/preview-modal-over-full-page.md)** — click a row for a quick preview + actions; escalate to a full page only for heavy work, and never lose the filtered list.
+- **[Responsive tables on mobile](../patterns/responsive-tables-on-mobile.md)** — reflow dense rows into labelled cards so data isn't clipped on small screens.
 - Data tables (sort / filter / bulk) · Command palette / quick nav · Slide-over panels · Inline validation · Undo-instead-of-confirm · Saved views · Empty & no-results states
 
 ## Pitfalls & anti-patterns

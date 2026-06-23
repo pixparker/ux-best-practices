@@ -8,7 +8,9 @@ archetypes: [consumer-mobile, ecommerce]
 status: draft
 related:
   - bottom-sheet-and-thumb-zone.md
+  - lock-scroll-when-modal-open.md
   - ../principles/forgiveness-undo-over-confirm.md
+  - ../principles/reload-returns-to-main-content.md
 last_updated: 2026-06-16
 ---
 

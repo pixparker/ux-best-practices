@@ -21,6 +21,7 @@ open showcases/skeleton-loading/index.html      # macOS
 | [`back-friendly-modals/`](back-friendly-modals/) | The modal family: Back closes the modal (History API), background **scroll lock**, and **swipe-to-dismiss** overlays from **all 4 sides** (sheet ↓, top ↑, left ←, right →) | [back-friendly-modals](../docs/patterns/back-friendly-modals.md) · [scroll-lock](../docs/patterns/lock-scroll-when-modal-open.md) · [swipe-to-dismiss](../docs/patterns/swipe-to-dismiss-drawers.md) |
 | [`tap-feedback/`](tap-feedback/) | Kill the default mobile **tap-highlight** flash; replace with intentional `:active` feedback, keep keyboard focus | [ui/tap-and-touch-feedback](../docs/ui/tap-and-touch-feedback.md) |
 | [`full-height-hero/`](full-height-hero/) | The **100vh trap**: switch units (vh/svh/lvh/dvh/JS-frozen) and watch a live height readout — `dvh` resizes/jumps, static units stay put | [ui/full-height-and-the-mobile-viewport](../docs/ui/full-height-and-the-mobile-viewport.md) |
+| [`ops-panel/`](ops-panel/) | **Preview-first** ops grid: row click → quick preview + actions, escalate to full view, list state preserved; table **reflows to cards** on mobile | [preview-modal-over-full-page](../docs/patterns/preview-modal-over-full-page.md) · [responsive-tables-on-mobile](../docs/patterns/responsive-tables-on-mobile.md) |
 
 ## Conventions
 
