@@ -36,7 +36,7 @@ The actual advice. Be concrete. Prefer rules a developer can act on today.
 
 Link to a runnable demo if one exists, and describe what to look for.
 
-- 👉 [`showcases/<name>/`](../../showcases/) — *what it demonstrates*
+- 👉 `showcases/<name>/` — *what it demonstrates*
 
 ## Pitfalls & anti-patterns
 

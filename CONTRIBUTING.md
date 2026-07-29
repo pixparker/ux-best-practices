@@ -19,6 +19,7 @@ Thanks for wanting to make this better. This is a living reference, so contribut
    - [`docs/archetypes/`](docs/archetypes/) — a playbook for a product type.
    - [`docs/platforms/`](docs/platforms/) — guidance for a delivery context.
    - [`docs/checklists/`](docs/checklists/) — an actionable list.
+   - [`docs/pains/`](docs/pains/) — **a real failure we hit.** Use [`docs/pains/_TEMPLATE.md`](docs/pains/_TEMPLATE.md) (pain point → approach → result → best practice) and name it `PAIN-NNN-kebab-title.md`. You do not need a solution to file one — `status: open` is a valid entry.
 2. Copy [`docs/_TEMPLATE.md`](docs/_TEMPLATE.md) into that folder, rename it `kebab-case-title.md`.
 3. Fill in the front-matter and sections. Keep the **front-matter accurate** — it powers search, tagging, and AI parsing.
 4. Add a link to it from that bucket's `README.md`.

@@ -9,6 +9,13 @@ This repo is organized along two axes — **archetypes** (what you're building) 
 - [Docs index](docs/README.md): the full map of the reference.
 - [Entry template](docs/_TEMPLATE.md): the shape and front-matter of every guideline.
 
+## Pains (evidence — read before designing)
+- [Pains registry](docs/pains/README.md): real failures we hit, each with pain point -> approach -> result -> best practice. THE PAIN IS BINDING, THE SOLUTION IS A REFERENCE: a design may address a pain differently, but may not leave it in place.
+- [PAIN-001 Back exits the app](docs/pains/PAIN-001-back-button-exits-the-app.md): a user opens an overlay, presses Back expecting to close it, and the browser unloads the whole page.
+- [PAIN-002 Row click loses the list](docs/pains/PAIN-002-every-row-click-loses-your-place.md): an operator filters a grid, opens a row, returns - filters, sort, scroll and selection are gone.
+- [PAIN-003 Full-height sections jump](docs/pains/PAIN-003-full-height-sections-jump-mid-scroll.md): a 100vh hero resizes when the mobile address bar hides, jerking the page mid-scroll.
+- [Pain review checklist](docs/checklists/pain-review.md): at design time, give every applicable pain one of three answers - addressed, not applicable, or accepted (recorded).
+
 ## Principles (why)
 - [Feedback for every action](docs/principles/feedback-for-every-action.md): every action needs an immediate, visible response.
 - [Design every state](docs/principles/design-every-state.md): design empty, loading, error, and partial states — not just the happy path.
