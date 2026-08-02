@@ -31,6 +31,7 @@ last_updated: 2026-06-16
 - [ ] Input `font-size ≥ 16px` to avoid iOS zoom-on-focus.
 - [ ] Validation is **inline** and on blur, with helpful messages.
 - [ ] Autofill, autocomplete, and sane defaults are enabled.
+- [ ] **With the keyboard open**, the focused field's **label, hint and error stay visible** and the readable content region keeps ≥ ~45% of the visible viewport — sticky header/CTA yield ([PAIN-004](../pains/PAIN-004-keyboard-crushes-the-form.md)).
 
 ## Performance (perceived)
 - [ ] First meaningful paint feels fast on a **mid-range device / 3G-ish** network.

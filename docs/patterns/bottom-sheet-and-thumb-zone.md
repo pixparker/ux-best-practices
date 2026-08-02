@@ -52,6 +52,7 @@ Most phone use is one-handed, with the thumb pivoting from the bottom. The top c
 
 ## Pitfalls & anti-patterns
 
+- **The bottom bar that never yields** — a sticky bottom CTA is right at rest, but when the soft keyboard opens it and the sticky header can squeeze the form to a sliver. See [bottom CTAs & the soft keyboard](bottom-cta-and-the-soft-keyboard.md) and [PAIN-004](../pains/PAIN-004-keyboard-crushes-the-form.md).
 - **Bottom-sheet overload** — nesting sheets or using them for full workflows that deserve a page.
 - **No dismissal affordance** — users get stuck.
 - **Ignoring safe areas** — controls hidden behind the home indicator.

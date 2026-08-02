@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Keyboard vs. bottom CTA — the content budget — UX Showcase</title>
+  <meta name="description" content="When the soft keyboard opens, a pinned bottom CTA plus a sticky header can crush the form to a sliver. Guarantee a minimum content height and make the chrome yield — starting by un-pinning the CTA." />
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body { font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #1b2330; background: #eef2f7; -webkit-font-smoothing: antialiased; }
+
+    /* ─── the stage ────────────────────────────────────────────────────────
+       One box represents the physical screen. Its height is --stage-h.
+       The app gets (stage-h − kb); the keyboard occupies the bottom --kb.
+       On a real phone --kb comes from window.visualViewport, and the fake
+       keyboard graphic is hidden because a real one is sitting there.     */
+    .stage { display: flex; justify-content: center; padding: 26px 16px 40px; }
+    .screen { position: relative; overflow: hidden; width: 390px; height: var(--stage-h, 720px);
+      background: #fff; border-radius: 30px; box-shadow: 0 20px 60px rgba(16,24,40,.22); border: 1px solid #d9e0ea; }
+
+    html.phone .stage { padding: 0; }
+    html.phone .screen { position: fixed; inset: 0; width: auto; border-radius: 0; border: 0; box-shadow: none; }
+    html.phone, html.phone body { height: 100%; overflow: hidden; }
+
+    /* the app fills the screen minus the keyboard — this is the visible viewport.
+       NO transition on `bottom`. The budget measures this box synchronously, and a
+       transition means the first measurement reads the PRE-keyboard height — the
+       ladder then concludes there is plenty of room and never escalates. Never
+       animate a property you measure. (The keyboard's own animation is enough:
+       visualViewport fires resize repeatedly as it slides, so the shell follows.) */
+    .app { position: absolute; left: 0; right: 0; top: 0; bottom: var(--kb, 0px);
+      display: flex; flex-direction: column; min-height: 0; }
+
+    /* height is driven by --kb, so it must clip: at --kb:0 the keys would
+       otherwise spill out of a zero-height box and land on top of the CTA */
+    .fakekb { position: absolute; left: 0; right: 0; bottom: 0; height: var(--kb, 0px); overflow: hidden;
+      background: #cfd4dc; display: grid; place-content: center; gap: 6px; color: #5b6472; font-size: .78rem; }
+    .fakekb[hidden] { display: none; }
+    .fakekb div { display: flex; gap: 5px; justify-content: center; }
+    .fakekb i { display: block; width: 26px; height: 30px; background: #fff; border-radius: 5px; box-shadow: 0 1px 0 #aeb6c2; }
+    html.phone .fakekb { display: none; }
+
+    /* ─── app chrome: the two things that refuse to give up pixels ───────── */
+    .appbar { flex: none; background: #fff; border-bottom: 1px solid #e6ebf1; padding: 12px 16px 0; }
+    .brand { display: flex; align-items: center; gap: 10px; padding-bottom: 12px; }
+    .brand .mark { width: 38px; height: 38px; border-radius: 10px; background: #111827; color: #fff;
+      display: grid; place-content: center; font-weight: 800; flex: none; }
+    .brand h1 { font-size: 1rem; margin: 0; letter-spacing: -.01em; }
+    .brand .sub { font-size: .78rem; color: #7a869a; margin: 0; }
+
+    .stepper { display: flex; gap: 4px; padding-bottom: 12px; }
+    .stepper .st { flex: 1; text-align: center; font-size: .7rem; color: #97a1b0; }
+    .stepper .st b { display: block; height: 5px; border-radius: 3px; background: #e2e8f0; margin-bottom: 6px; }
+    .stepper .st.on { color: #111827; font-weight: 700; }
+    .stepper .st.on b { background: #111827; }
+
+    .tabrow { font-size: .85rem; font-weight: 700; color: #111827; padding-bottom: 9px;
+      border-bottom: 2px solid #111827; margin-bottom: 8px; }
+
+    /* ─── scrollable content — the thing that must keep a minimum ───────── */
+    .scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+      background: #f7f9fc; display: flex; flex-direction: column; }
+    .form { padding: 16px; display: grid; gap: 14px; align-content: start; }
+    .sect h2 { font-size: 1.18rem; margin: 0 0 4px; letter-spacing: -.02em; }
+    .sect p { margin: 0; color: #6b7686; font-size: .86rem; }
+    .field label { display: block; font-size: .82rem; font-weight: 600; margin-bottom: 6px; }
+    .field input { width: 100%; font: inherit; padding: 13px 12px; border: 1px solid #d6dee8; border-radius: 10px;
+      background: #fff; }
+    .field input:focus { outline: 2px solid #111827; outline-offset: 1px; border-color: #111827; }
+    .field .hint { font-size: .74rem; color: #8b95a5; margin: 6px 0 0; }
+
+    .explain { background: #fff; border: 1px solid #e6ebf1; border-radius: 12px; padding: 12px 14px; font-size: .82rem; color: #4a5568; }
+    .explain b { color: #1b2330; }
+
+    /* ─── the CTA: a real row of the app shell, not an overlay ────────────
+       It is a flex sibling of the scroll region, so it ALWAYS shows and it
+       never covers content — the scroll region is sized to exclude it.
+       Neither `fixed` (iOS displaces it) nor `sticky` (depends on scroll
+       position and on the scroller's quirks). At L1+ the same node is moved
+       INTO the scroll region, where it flows to the end of the form.      */
+    .ctabar { flex: none; margin-top: auto;
+      background: #fff; border-top: 1px solid #e6ebf1;
+      padding: 14px 16px calc(14px + env(safe-area-inset-bottom)); }
+    .ctabar button { width: 100%; font: inherit; font-weight: 700; padding: 15px; border: 0; border-radius: 12px;
+      background: #111827; color: #fff; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+    .ctabar button:active { transform: scale(.99); }
+
+    /* ─── the degradation ladder (budget mode only) ──────────────────────
+       L0 nothing given up — the CTA is a pinned row of the shell
+       L1 the CTA LEAVES THE SHELL: it moves into the scroll region (see
+          placeCta) and flows to the end of the form, reached by scrolling.
+          This rung is first because it is the cheapest and the largest —
+          it returns the whole bar (~84px) and costs only a tap the soft
+          keyboard's own next/done key already provides.
+       L2 the header compacts as well — subtitle, step labels, section tab
+          drop; the logo shrinks. Orientation is worth more than the bar,
+          so it is spent last.                                            */
+    [data-mode="budget"][data-level="2"] .brand .sub { display: none; }
+    [data-mode="budget"][data-level="2"] .stepper .st span { display: none; }
+    [data-mode="budget"][data-level="2"] .brand .mark { width: 26px; height: 26px; font-size: .8rem; border-radius: 7px; }
+    [data-mode="budget"][data-level="2"] .tabrow { display: none; }
+
+    /* ─── readout, always on screen, part of the app bar ─────────────────── */
+    .readout { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .68rem;
+      border-top: 1px dashed #e6ebf1; padding: 5px 0 6px; color: #5b6472;
+      display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; justify-content: space-between; }
+    .readout > span:first-child { min-width: 0; flex: 1 1 60%; overflow-wrap: anywhere; }
+    .readout .bad { color: #d92d20; font-weight: 700; }
+    .readout .ok { color: #067647; font-weight: 700; }
+    .modes { display: flex; gap: 4px; flex: none; }
+    .modes button { font: inherit; font-family: inherit; font-size: .68rem; padding: 3px 8px; border-radius: 999px;
+      border: 1px solid #d6dee8; background: #fff; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    .modes button[aria-pressed="true"] { background: #111827; color: #fff; border-color: #111827; }
+
+    /* Outlines the region the user can actually read into. Watch it collapse
+       in broken mode and hold its ground in budget mode. */
+    .guide { position: absolute; left: 0; right: 0; pointer-events: none;
+      border: 2px dashed rgba(217,45,32,.6); border-radius: 4px; }
+    .guide.ok { border-color: rgba(6,118,71,.55); }
+    .guide::after { content: attr(data-label); position: absolute; right: 4px; bottom: 2px;
+      font: 700 .62rem ui-monospace, Menlo, monospace; color: #d92d20;
+      background: rgba(255,255,255,.85); padding: 0 4px; border-radius: 3px; }
+    .guide.ok::after { color: #067647; }
+
+    /* ─── page copy (desktop only; on a phone the screen is the whole page) */
+    .copy { max-width: 640px; margin: 0 auto 40px; padding: 0 18px; color: #48546a; }
+    .copy h2 { color: #1b2330; margin: 26px 0 6px; font-size: 1.05rem; }
+    .copy code { background: #e4eaf2; border-radius: 5px; padding: 1px 5px; font-size: .88em; }
+    .copy ul { padding-left: 20px; }
+    .kbcontrols { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 0 0 18px; }
+    .kbcontrols button { font: inherit; font-weight: 600; font-size: .85rem; padding: 8px 14px; border-radius: 999px;
+      border: 1px solid #cbd5e1; background: #fff; cursor: pointer; }
+    .kbcontrols button[aria-pressed="true"] { background: #111827; color: #fff; border-color: #111827; }
+    html.phone .copy, html.phone .kbcontrols { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="kbcontrols" id="kbcontrols" role="group" aria-label="Simulated keyboard">
+    <button data-kb="0" aria-pressed="true">⌨︎ keyboard closed</button>
+    <button data-kb="0.45" aria-pressed="false">keyboard (45%)</button>
+    <button data-kb="0.55" aria-pressed="false">keyboard + suggestions (55%)</button>
+    <button data-kb="0.62" aria-pressed="false">+ emoji / toolbar (62%)</button>
+  </div>
+
+  <div class="stage">
+    <div class="screen" id="screen" data-mode="broken" data-level="0">
+      <div class="app" id="app">
+
+        <header class="appbar" id="appbar">
+          <div class="brand">
+            <div class="mark">C</div>
+            <div>
+              <h1>Studio Card</h1>
+              <p class="sub">Every brand has a story</p>
+            </div>
+          </div>
+          <div class="stepper" aria-hidden="true">
+            <div class="st on"><b></b><span>About you</span></div>
+            <div class="st"><b></b><span>Goals</span></div>
+            <div class="st"><b></b><span>Market</span></div>
+            <div class="st"><b></b><span>Brand</span></div>
+            <div class="st"><b></b><span>Style</span></div>
+          </div>
+          <div class="tabrow">Introduction</div>
+          <div class="readout">
+            <span id="ro">–</span>
+            <span class="modes" role="group" aria-label="Mode">
+              <button data-mode="broken" aria-pressed="true">broken</button>
+              <button data-mode="budget" aria-pressed="false">budget</button>
+            </span>
+          </div>
+        </header>
+
+        <div class="scroll" id="scroll">
+          <div class="form">
+            <div class="sect">
+              <h2>First, introduce yourself</h2>
+              <p>So we know who filled this in, and how to reach you about it.</p>
+            </div>
+
+            <div class="field">
+              <label for="f1">Full name *</label>
+              <input id="f1" type="text" placeholder="e.g. Ali Mohammadi" autocomplete="name" />
+              <p class="hint">As it should appear on the brief.</p>
+            </div>
+
+            <div class="field">
+              <label for="f2">Business or company name *</label>
+              <input id="f2" type="text" placeholder="Your studio or brand" autocomplete="organization" />
+              <p class="hint">Leave blank if you don't have one yet.</p>
+            </div>
+
+            <div class="field">
+              <label for="f3">Mobile number *</label>
+              <input id="f3" type="tel" inputmode="tel" placeholder="09…" autocomplete="tel" />
+              <p class="hint">We only use this to continue the conversation.</p>
+            </div>
+
+            <div class="explain">
+              <b>What to do:</b> tap a field on a real phone (or use the keyboard buttons above on desktop),
+              then flip <b>broken ⇄ budget</b> in the bar above. In <b>broken</b>, the header and the tall
+              CTA bar keep every pixel and the form collapses to a sliver. In <b>budget</b>, the content
+              region is guaranteed ≥45% of the visible viewport and the chrome yields to pay for it —
+              watch the <b>L0…L2</b> marker as you make the keyboard taller.
+            </div>
+          </div>
+        </div>
+
+        <div class="ctabar" id="ctabar">
+          <button type="button">Continue →</button>
+        </div>
+
+      </div>
+
+      <div class="guide" id="guide" aria-hidden="true"></div>
+
+      <div class="fakekb" id="fakekb" aria-hidden="true">
+        <div><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <span>simulated soft keyboard</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="copy">
+    <h2>The pain</h2>
+    <p>A bottom-anchored CTA is the right call at rest — it is thumb-reachable and always available. But the
+      soft keyboard takes 40–62% of the screen, and neither the header nor the CTA gives anything
+      back. Content is squeezed from both ends until the user is typing into a field whose <em>label and hint are
+      off-screen</em>, with the next field clipped behind a button they do not need yet.</p>
+
+    <h2>The rule: a content budget</h2>
+    <p>Chrome is the thing that yields. Declare an invariant — <b>the scrollable content region never drops below
+      45% of the visible viewport</b> — and degrade the chrome in a defined order until it holds. Each rung is
+      re-measured before the next is tried, so you only ever give up as much as you have to:</p>
+    <ul>
+      <li><b>L0</b> — everything at full size, CTA pinned. Keyboard closed, or open with room to spare.</li>
+      <li><b>L1</b> — <b>the CTA leaves the shell</b> and flows to the end of the form, reached by scrolling.
+        Spent first: it is the biggest saving and the cheapest, because while the keyboard is open the button's job
+        is already covered by the keyboard's own <em>next/done</em> key. It returns the moment the keyboard closes.</li>
+      <li><b>L2</b> — the header compacts as well (subtitle, step labels and section tab drop, logo shrinks).
+        Spent last — knowing which step you are on is worth more than a button you can scroll to.</li>
+    </ul>
+
+    <h2>Where to put the bar</h2>
+    <p>Not <code>position: fixed</code>, and not <code>position: sticky</code> either. The CTA here is a
+      <b>flex row of the app shell</b>, a sibling of the scroll region:</p>
+    <p><code>.app { display: flex; flex-direction: column } → .appbar (flex:none) · .scroll (flex:1, overflow:auto) · .ctabar (flex:none)</code></p>
+    <p>It is therefore always visible regardless of scroll position, it never covers content (the scroll region is
+      sized to exclude it), and it sidesteps iOS's displacement of fixed elements. “Leave the shell” at L3 is then
+      just moving that one node into the scroll region.</p>
+
+    <h2>How the keyboard is measured</h2>
+    <p>CSS cannot see the keyboard. <code>100vh</code>, <code>100dvh</code> and <code>100svh</code> are anchored
+      to the <em>layout</em> viewport, which iOS Safari does not shrink when the keyboard opens. The only reliable
+      signal is <code>window.visualViewport</code>:</p>
+    <p><code>kb = innerHeight − visualViewport.height − visualViewport.offsetTop</code></p>
+
+    <h2>Two things that are easy to miss</h2>
+    <p><b>Pin the page.</b> iOS scrolls the <em>layout</em> viewport to reveal the focused input. A shell fixed to that
+      viewport gets dragged with it, and its bottom row — the CTA — slides off screen, so the button appears and
+      disappears depending on page scroll. Since the shell owns its own scrolling, keep the page itself at
+      <code>scrollY = 0</code>.</p>
+    <p><b>Never animate what you measure.</b> This shell used to carry <code>transition: bottom .18s</code>. The budget
+      then measured the height the shell had <em>before</em> the keyboard opened, concluded there was plenty of room, and
+      stayed at L0 — reproducing the original pain in code that reported success. It only showed up when a human toggled
+      the keyboard, never on page load. You don't need the transition: <code>visualViewport</code> fires
+      <code>resize</code> continuously as the keyboard slides, so an untransitioned shell tracks it smoothly for free.</p>
+    <p><b>Bring the field into the preserved region.</b> A guaranteed content region only helps if the focused field
+      lands inside it — so on focus, wait for the keyboard animation to settle, re-measure, then scroll the field
+      (with its label and hint) to the centre of the content region.</p>
+    <p style="margin-top:24px"><a href="../../docs/pains/PAIN-004-keyboard-crushes-the-form.md">PAIN-004</a> ·
+      <a href="../../docs/patterns/bottom-cta-and-the-soft-keyboard.md">the pattern</a> ·
+      <a href="../">all showcases</a></p>
+  </div>
+
+<script>
+  const root    = document.documentElement;
+  const screenEl= document.getElementById('screen');
+  const appEl   = document.getElementById('app');
+  const appbar  = document.getElementById('appbar');
+  const scroll  = document.getElementById('scroll');
+  const ctabar  = document.getElementById('ctabar');
+  const ro      = document.getElementById('ro');
+  const guide   = document.getElementById('guide');
+  const fakekb  = document.getElementById('fakekb');
+
+  const DESKTOP_SCREEN = 720;   // the simulated phone screen, in px
+  const BUDGET = 0.45;          // content never gets less than this share of the visible viewport
+  const FLOOR  = 130;           // ...but never demand more than is physically sensible
+
+  let mode  = 'broken';
+  let simKb = 0;                // desktop: fraction of the screen the fake keyboard covers
+
+  /* ── measure ─────────────────────────────────────────────────────────── */
+  function keyboardInset(stage) {
+    const vv = window.visualViewport;
+    if (root.classList.contains('phone') && vv) {
+      return Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+    }
+    return Math.round(stage * simKb);
+  }
+
+  // iOS scrolls the LAYOUT viewport to reveal the focused input. Our app shell is
+  // fixed to that viewport, so the page scroll drags the whole shell — and the
+  // bottom of it (the CTA) — off screen. The shell owns its own scrolling, so the
+  // page must stay pinned at 0.
+  function pinPage() {
+    if (root.classList.contains('phone') && window.scrollY !== 0) window.scrollTo(0, 0);
+  }
+
+  // L0:    the CTA is a pinned row of the app shell — always visible, never overlapping.
+  // L1/L2: the same node moves into the scroll region and flows to the end of the form,
+  //        where the user reaches it by scrolling down (the keyboard's next/done key is
+  //        the affordance while typing). It moves back the instant the keyboard closes.
+  function placeCta(level) {
+    const target = level >= 1 ? scroll : appEl;
+    if (ctabar.parentElement !== target) target.appendChild(ctabar);
+  }
+
+  /* ── apply ───────────────────────────────────────────────────────────── */
+  function apply() {
+    root.classList.toggle('phone', window.innerWidth < 700);
+    pinPage();
+    const stage = root.classList.contains('phone') ? window.innerHeight : DESKTOP_SCREEN;
+    const kb    = keyboardInset(stage);
+    const visible = stage - kb;                      // what the user can actually see
+
+    root.style.setProperty('--stage-h', stage + 'px');
+    root.style.setProperty('--kb', kb + 'px');
+    fakekb.hidden = kb < 8;
+
+    const min = Math.max(FLOOR, Math.round(visible * BUDGET));
+
+    let level = 0;
+    if (mode === 'budget') {
+      // Escalate one rung at a time and re-measure. Reading clientHeight forces
+      // a reflow on purpose — the point is to check the real, post-layout height.
+      for (level = 0; level < 2; level++) {
+        screenEl.dataset.level = level;
+        placeCta(level);
+        if (contentSpace() >= min) break;
+      }
+    }
+    screenEl.dataset.level = level;
+    placeCta(level);
+    report(visible, min, level);
+  }
+
+  // How much content the user can actually read. Because the CTA is a row of the
+  // shell rather than an overlay, the scroll box IS the readable region — nothing
+  // is hidden behind anything.
+  function contentSpace() {
+    return scroll.clientHeight;
+  }
+
+  function report(visible, min, level) {
+    const c   = contentSpace();
+    const pct = visible ? Math.round((c / visible) * 100) : 0;
+    const chrome = visible - c;
+    const ok  = c >= min;
+    ro.innerHTML =
+      'content <b>' + c + 'px</b> (' + pct + '%) · chrome ' + chrome + 'px · ' +
+      (mode === 'budget' ? 'L' + level + ' ' : '') +
+      '<span class="' + (ok ? 'ok' : 'bad') + '">' + (ok ? '✓' : '✕ crushed') + '</span>';
+
+    // outline the real content region so the collapse is visible, not just a number
+    const kb = parseInt(root.style.getPropertyValue('--kb'), 10) || 0;
+    guide.style.top    = appbar.offsetHeight + 'px';
+    guide.style.bottom = (kb + (level >= 1 ? 0 : ctabar.offsetHeight)) + 'px';
+    guide.classList.toggle('ok', ok);
+    guide.dataset.label = 'readable ' + pct + '% · need ' + Math.round(BUDGET * 100) + '%';
+  }
+
+  /* ── keep the focused field inside the preserved region ──────────────── */
+  document.querySelectorAll('input').forEach((el) => {
+    el.addEventListener('focus', () => {
+      setTimeout(() => {
+        apply();
+        el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }, 250); // let the keyboard finish animating before measuring
+    });
+  });
+
+  /* ── controls ────────────────────────────────────────────────────────── */
+  document.querySelectorAll('.modes button').forEach((b) => {
+    b.addEventListener('click', () => {
+      mode = b.dataset.mode;
+      screenEl.dataset.mode = mode;
+      document.querySelectorAll('.modes button')
+        .forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.mode === mode)));
+      apply();
+    });
+  });
+
+  document.querySelectorAll('#kbcontrols button').forEach((b) => {
+    b.addEventListener('click', () => {
+      simKb = parseFloat(b.dataset.kb);
+      document.querySelectorAll('#kbcontrols button')
+        .forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      apply();
+    });
+  });
+
+  // ?kb=0.45&mode=budget — so a specific state can be linked to or screenshotted
+  const q = new URLSearchParams(location.search);
+  if (q.has('kb')) {
+    simKb = parseFloat(q.get('kb')) || 0;
+    document.querySelectorAll('#kbcontrols button')
+      .forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.kb === q.get('kb'))));
+  }
+  if (q.get('mode') === 'budget') {
+    mode = 'budget';
+    screenEl.dataset.mode = 'budget';
+    document.querySelectorAll('.modes button')
+      .forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.mode === 'budget')));
+  }
+
+  if (window.visualViewport) {
+    visualViewport.addEventListener('resize', apply);
+    visualViewport.addEventListener('scroll', apply);
+  }
+  window.addEventListener('resize', apply);
+  window.addEventListener('orientationchange', () => setTimeout(apply, 250));
+  apply();
+</script>
+</body>
+</html>

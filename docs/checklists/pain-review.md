@@ -47,6 +47,7 @@ Every applicable pain gets exactly one:
 | PAIN-001 Back exits the app | | |
 | PAIN-002 Row click loses the list | | |
 | PAIN-003 Full-height sections jump | | |
+| PAIN-004 Keyboard crushes the form | | |
 
 **3. Look for the pain you're about to create**
 - [ ] What does this surface do that **no existing pain covers**? Overlays, long lists, live-updating data, money, destructive actions, anything that holds unsaved state — these are where pains come from.

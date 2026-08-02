@@ -28,7 +28,9 @@ Use it to find the right doc fast.
 2. **Design all states, not just the happy path.** Always handle **empty**, **loading**, and
    **error** states. A blank screen is a bug.
 3. **Mobile-first & touch-safe.** Tap targets ≥ 44×44px, primary actions in the thumb zone,
-   input `font-size ≥ 16px`, respect safe-area insets, no hover-only affordances.
+   input `font-size ≥ 16px`, respect safe-area insets, no hover-only affordances. A sticky bottom
+   CTA must **yield when the soft keyboard opens** — the form is what the user is looking at.
+   → [patterns/bottom-cta-and-the-soft-keyboard](docs/patterns/bottom-cta-and-the-soft-keyboard.md)
 4. **Accessible by default.** WCAG AA contrast, semantic HTML, labels/roles, visible focus,
    keyboard operable, and honor `prefers-reduced-motion`.
 5. **Perceived performance first.** Prefer skeletons over blank spinners; avoid layout shift;
@@ -50,6 +52,8 @@ Use it to find the right doc fast.
 - Aggressive/long animations on high-frequency actions; ignoring `prefers-reduced-motion`.
 - Full-page reloads for small state changes; non-deep-linkable filtered views (ops panels).
 - Infinite scroll where stable, addressable positions are needed.
+- `position: fixed; bottom: 0` bars on a form surface, and app shells sized with `100vh`/`100dvh` —
+  neither accounts for the soft keyboard; measure it with `window.visualViewport`.
 
 ## When unsure
 

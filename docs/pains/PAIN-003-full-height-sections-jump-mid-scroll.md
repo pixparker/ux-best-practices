@@ -84,4 +84,5 @@ The hero stopped moving. The section is very slightly shorter than the absolute 
 
 ## Related pains
 
+- [PAIN-004](PAIN-004-keyboard-crushes-the-form.md) — the same root cause with a different trigger: **viewport units describe a viewport the user is not looking at.** Here it is the address bar; there it is the soft keyboard.
 - Companion craft: [spacing & layout](../ui/spacing-and-layout.md), [tap & touch feedback](../ui/tap-and-touch-feedback.md) — the other two "only visible on a real device" categories.
