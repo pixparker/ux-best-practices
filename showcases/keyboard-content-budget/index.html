@@ -293,7 +293,7 @@
   const BUDGET = 0.45;          // content never gets less than this share of the visible viewport
   const FLOOR  = 130;           // ...but never demand more than is physically sensible
 
-  let mode  = 'broken';
+  let mode  = 'broken';   // show the pain first; `budget` is the fix to switch to
   let simKb = 0;                // desktop: fraction of the screen the fake keyboard covers
 
   /* ── measure ─────────────────────────────────────────────────────────── */
@@ -413,11 +413,11 @@
     document.querySelectorAll('#kbcontrols button')
       .forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.kb === q.get('kb'))));
   }
-  if (q.get('mode') === 'budget') {
-    mode = 'budget';
-    screenEl.dataset.mode = 'budget';
+  if (q.get('mode') === 'broken' || q.get('mode') === 'budget') {
+    mode = q.get('mode');
+    screenEl.dataset.mode = mode;
     document.querySelectorAll('.modes button')
-      .forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.mode === 'budget')));
+      .forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.mode === mode)));
   }
 
   if (window.visualViewport) {
