@@ -38,6 +38,7 @@ Copy [`_TEMPLATE.md`](_TEMPLATE.md).
 | [PAIN-001](PAIN-001-back-button-exits-the-app.md) | Back closes the **app** instead of the open overlay | consumer-mobile · ecommerce · ops | ✅ solved | 🟢 code + check |
 | [PAIN-002](PAIN-002-every-row-click-loses-your-place.md) | Opening a row loses the filtered list you spent effort building | ops-admin-panel | ✅ solved | 🟡 check |
 | [PAIN-003](PAIN-003-full-height-sections-jump-mid-scroll.md) | Full-height sections resize and jump as the mobile address bar hides | consumer-mobile · ecommerce | ✅ solved | 🔴 prose |
+| [PAIN-004](PAIN-004-keyboard-crushes-the-form.md) | The keyboard opens and the bottom CTA **crushes the form** to a sliver | consumer-mobile · ecommerce · fancy-app | 🟡 mitigated | 🔴 prose |
 
 **Status:** ✅ solved · 🟡 mitigated (works, with known holes) · 🔴 open (no good answer yet — say so).
 **Enforcement** ([why this column exists](#enforcement)): 🟢 code · 🟡 check · 🔴 prose.

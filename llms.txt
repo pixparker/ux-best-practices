@@ -14,6 +14,7 @@ This repo is organized along two axes — **archetypes** (what you're building) 
 - [PAIN-001 Back exits the app](docs/pains/PAIN-001-back-button-exits-the-app.md): a user opens an overlay, presses Back expecting to close it, and the browser unloads the whole page.
 - [PAIN-002 Row click loses the list](docs/pains/PAIN-002-every-row-click-loses-your-place.md): an operator filters a grid, opens a row, returns - filters, sort, scroll and selection are gone.
 - [PAIN-003 Full-height sections jump](docs/pains/PAIN-003-full-height-sections-jump-mid-scroll.md): a 100vh hero resizes when the mobile address bar hides, jerking the page mid-scroll.
+- [PAIN-004 Keyboard crushes the form](docs/pains/PAIN-004-keyboard-crushes-the-form.md): the soft keyboard takes half the screen, the sticky header and the bottom CTA keep their full height, and the form collapses to a sliver - the user types into a field whose label has scrolled away.
 - [Pain review checklist](docs/checklists/pain-review.md): at design time, give every applicable pain one of three answers - addressed, not applicable, or accepted (recorded).
 
 ## Principles (why)
@@ -41,6 +42,7 @@ This repo is organized along two axes — **archetypes** (what you're building) 
 - [Swipe to dismiss (drawers & sheets)](docs/patterns/swipe-to-dismiss-drawers.md): dismiss an overlay by swiping it back the way it entered (right drawer→swipe right, bottom sheet→swipe down); follow-finger drag with distance/velocity threshold, always keep button/Back/Esc closers too.
 - [Preview-first: quick modal over full-page navigation](docs/patterns/preview-modal-over-full-page.md): in ops/admin grids, open a fast preview modal with quick actions on row click and preserve list filters/sort/scroll; escalate to a full page only for heavy work, so users never lose their place.
 - [Responsive tables on mobile](docs/patterns/responsive-tables-on-mobile.md): reflow data tables into labelled cards (label:value) on narrow screens (or prioritize columns / sticky-column scroll / row-to-preview) so rich rows aren't clipped by cell borders.
+- [Bottom CTAs & the soft keyboard](docs/patterns/bottom-cta-and-the-soft-keyboard.md): the soft keyboard is invisible to CSS (no viewport unit accounts for it) - measure it with window.visualViewport, guarantee the scrollable content region at least ~45% of the visible viewport, and pay for it with a ladder: compact the header, then compact the CTA bar, and only as a last resort move the CTA out of the shell. Put the bar in the app shell's flex flow (always visible, never overlapping) rather than position:fixed or position:sticky, both of which make its visibility depend on scroll position.
 - [Patterns index](docs/patterns/README.md): reusable solutions to recurring interaction problems.
 
 ## Techniques (feel)

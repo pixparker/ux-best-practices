@@ -22,6 +22,7 @@ open showcases/skeleton-loading/index.html      # macOS
 | [`tap-feedback/`](tap-feedback/) | Kill the default mobile **tap-highlight** flash; replace with intentional `:active` feedback, keep keyboard focus | [ui/tap-and-touch-feedback](../docs/ui/tap-and-touch-feedback.md) |
 | [`full-height-hero/`](full-height-hero/) | The **100vh trap**: switch units (vh/svh/lvh/dvh/JS-frozen) and watch a live height readout — `dvh` resizes/jumps, static units stay put | [ui/full-height-and-the-mobile-viewport](../docs/ui/full-height-and-the-mobile-viewport.md) |
 | [`ops-panel/`](ops-panel/) | **Preview-first** ops grid: row click → quick preview + actions, escalate to full view, list state preserved; table **reflows to cards** on mobile | [preview-modal-over-full-page](../docs/patterns/preview-modal-over-full-page.md) · [responsive-tables-on-mobile](../docs/patterns/responsive-tables-on-mobile.md) |
+| [`keyboard-content-budget/`](keyboard-content-budget/) | **Keyboard vs. bottom CTA**: toggle `broken ⇄ budget` and watch the readable content share collapse or hold; simulated keyboard on desktop, real `visualViewport` on a phone | [bottom-cta-and-the-soft-keyboard](../docs/patterns/bottom-cta-and-the-soft-keyboard.md) · [PAIN-004](../docs/pains/PAIN-004-keyboard-crushes-the-form.md) |
 
 ## Conventions
 

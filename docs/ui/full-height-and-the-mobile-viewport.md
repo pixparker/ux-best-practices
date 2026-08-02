@@ -88,6 +88,10 @@ window.addEventListener('orientationchange', () => setTimeout(setAppHeight, 200)
 
 > I hit this on the **Luna** template's full-height hero (and it'll affect any full-height hero). It opens with the address bar visible; as you scroll, the browser hides the bar, the window height changes, and the hero re-sizes to match — which makes the scroll position jump. Jarring. The fix is exactly *"calculate once and don't change the hero height after it's shown"* — these days that's a static unit like `100svh`, with the measure-once-and-freeze JS as the fallback for old browsers.
 
+## The other half of this problem
+
+The address bar is not the only thing that changes the visible area. The **soft keyboard** takes 40–62% of the screen and *no* viewport unit accounts for it — `svh`, `lvh` and `dvh` all track the layout viewport, which iOS Safari does not shrink when the keyboard opens. That needs `window.visualViewport` and a content budget: see [bottom CTAs & the soft keyboard](../patterns/bottom-cta-and-the-soft-keyboard.md) and [PAIN-004](../pains/PAIN-004-keyboard-crushes-the-form.md).
+
 ## References
 
 - MDN — *Viewport units: `svh`, `lvh`, `dvh`*
