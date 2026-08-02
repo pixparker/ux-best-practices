@@ -4,7 +4,7 @@ summary: In data grids (esp. ops panels), open a fast preview modal with quick a
 category: pattern
 tags: [ops-panel, admin, grid, table, modal, preview, navigation, productivity]
 platforms: [web, desktop, mobile-web]
-archetypes: [ops-admin-panel]
+archetypes: [ops-panel]
 status: draft
 related:
   - back-friendly-modals.md

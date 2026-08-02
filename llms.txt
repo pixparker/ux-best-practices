@@ -6,6 +6,7 @@ This repo is organized along two axes — **archetypes** (what you're building) 
 
 ## Start here (for agents)
 - [AGENTS.md](AGENTS.md): UX/UI operating rules and non-negotiable defaults for AI agents.
+- [index.html](index.html): browsable index of every rule, searchable and filterable by kind, platform and archetype; generated from front-matter by tools/build-index.py.
 - [Docs index](docs/README.md): the full map of the reference.
 - [Entry template](docs/_TEMPLATE.md): the shape and front-matter of every guideline.
 
@@ -42,7 +43,7 @@ This repo is organized along two axes — **archetypes** (what you're building) 
 - [Swipe to dismiss (drawers & sheets)](docs/patterns/swipe-to-dismiss-drawers.md): dismiss an overlay by swiping it back the way it entered (right drawer→swipe right, bottom sheet→swipe down); follow-finger drag with distance/velocity threshold, always keep button/Back/Esc closers too.
 - [Preview-first: quick modal over full-page navigation](docs/patterns/preview-modal-over-full-page.md): in ops/admin grids, open a fast preview modal with quick actions on row click and preserve list filters/sort/scroll; escalate to a full page only for heavy work, so users never lose their place.
 - [Responsive tables on mobile](docs/patterns/responsive-tables-on-mobile.md): reflow data tables into labelled cards (label:value) on narrow screens (or prioritize columns / sticky-column scroll / row-to-preview) so rich rows aren't clipped by cell borders.
-- [Bottom CTAs & the soft keyboard](docs/patterns/bottom-cta-and-the-soft-keyboard.md): the soft keyboard is invisible to CSS (no viewport unit accounts for it) - measure it with window.visualViewport, guarantee the scrollable content region at least ~45% of the visible viewport, and pay for it with a ladder: compact the header, then compact the CTA bar, and only as a last resort move the CTA out of the shell. Put the bar in the app shell's flex flow (always visible, never overlapping) rather than position:fixed or position:sticky, both of which make its visibility depend on scroll position.
+- [Bottom CTAs & the soft keyboard](docs/patterns/bottom-cta-and-the-soft-keyboard.md): the soft keyboard is invisible to CSS (no viewport unit accounts for it) - measure it with window.visualViewport, guarantee the scrollable content region at least ~45% of the visible viewport, and pay for it with a ladder, cheapest cost to the user first: L1 un-pin the CTA so it flows to the end of the form (the keyboard's own next/done key covers it while typing), then L2 compact the header. Put the bar in the app shell's flex flow (always visible, never overlapping) rather than position:fixed or position:sticky, both of which make its visibility depend on scroll position.
 - [Patterns index](docs/patterns/README.md): reusable solutions to recurring interaction problems.
 
 ## Techniques (feel)
