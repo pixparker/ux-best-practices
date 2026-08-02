@@ -1,8 +1,8 @@
 ---
 title: "Preview-first: quick modal over full-page navigation"
-summary: In data grids (esp. ops panels), open a fast preview modal with quick actions on row click; escalate to a full page only when the task is heavy — and never lose the filtered list.
+summary: In any list of actionable rows — a top-level grid or a list embedded in a record page — open a fast preview modal with quick actions on row click; escalate to a full page only when the task is heavy, and never lose the list underneath.
 category: pattern
-tags: [ops-panel, admin, grid, table, modal, preview, navigation, productivity]
+tags: [ops-panel, admin, grid, table, inline-list, modal, preview, navigation, productivity]
 platforms: [web, desktop, mobile-web]
 archetypes: [ops-panel]
 status: draft
@@ -12,7 +12,7 @@ related:
   - responsive-tables-on-mobile.md
   - ../principles/reload-returns-to-main-content.md
   - ../archetypes/ops-admin-panel.md
-last_updated: 2026-06-16
+last_updated: 2026-08-02
 ---
 
 # Preview-first: quick modal over full-page navigation
@@ -56,6 +56,33 @@ filter ──▶ click row ──▶ PREVIEW (overview + quick actions)
 - ❌ Reset filters/scroll when the user returns from an item (the #1 complaint).
 - ❌ Cram a heavy, full editing workflow into a tiny preview — that's when you *do* route to a page.
 - ❌ Force a page load just to flip one status or read two fields.
+
+## Inline lists count too
+
+The rule is usually written for the screen that *is* a grid. It applies just as
+much to the **lists embedded inside a record page** — "forms of this business",
+"invoices for this customer", "members of this team" — and those are the ones
+that get missed, because they don't look like a grid so nobody asks what a click
+should do. The default that gets written is `router.push(...)`, and it costs
+more here than on a top-level grid, not less: the operator loses a page they had
+navigated *to*, and Back returns them to it in whatever state the browser
+decides, not the one they left.
+
+**An inline list is a list. Clicking a row previews it.** Same overlay, same
+quick actions, same "Open full view" escalation — the operator reads the row,
+does the common thing, closes, and is still on the record they were working on.
+
+**Where it does not apply.** Two shapes look like inline lists and are not:
+
+- **A link list** — rows with a name and nothing else, no actions, nothing to
+  preview. A preview showing the two fields already on screen is ceremony; the
+  link is right.
+- **A list with no full view to escalate to** — if the entity has no page of its
+  own, there is no escalation and often nothing to act on. Read-only reference
+  data stays read-only text.
+
+Heuristic, same as the top-level one: **rows with actions get a preview; rows
+that are just labels get a link.**
 
 ## When to go full-page anyway
 
