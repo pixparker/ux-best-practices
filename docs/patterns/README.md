@@ -13,6 +13,7 @@ Reusable solutions to recurring interaction problems. A pattern describes *what 
 - [Preview-first: quick modal over full-page navigation](preview-modal-over-full-page.md) — ops grids: preview + quick actions on click, escalate only when heavy, never lose the list. *(has runnable demo)*
 - [Responsive tables on mobile](responsive-tables-on-mobile.md) — reflow rows into labelled cards so data isn't clipped by borders. *(has runnable demo)*
 - [Bottom CTAs & the soft keyboard](bottom-cta-and-the-soft-keyboard.md) — guarantee the content region a minimum share of the visible viewport; make the chrome yield. *(has runnable demo)*
+- [Two-column forms on desktop, one on mobile](two-column-forms-on-desktop.md) — pair short related fields, let long ones span; keep a live preview beside the controls that change it.
 
 ## Planned
 
