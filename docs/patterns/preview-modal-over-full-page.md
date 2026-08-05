@@ -4,7 +4,7 @@ summary: In any list of actionable rows — a top-level grid or a list embedded 
 category: pattern
 tags: [ops-panel, admin, grid, table, inline-list, modal, preview, navigation, productivity]
 platforms: [web, desktop, mobile-web]
-archetypes: [ops-admin-panel]
+archetypes: [ops-panel]
 status: draft
 related:
   - back-friendly-modals.md

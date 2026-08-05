@@ -12,6 +12,8 @@ The focus is on **principles**, not any single stack. Examples happen to use HTM
 
 It's built to be consumed by both **humans** (browse the docs, explore the playground) and **AI agents** (see [`AGENTS.md`](AGENTS.md) and [`llms.txt`](llms.txt)).
 
+👉 **Every rule in one place:** open [`index.html`](index.html) in a browser — a searchable, filterable index of all entries, generated from their front-matter. Regenerate it with `python3 tools/build-index.py` after adding or editing an entry.
+
 ---
 
 ## Who this is for

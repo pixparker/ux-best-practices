@@ -1,7 +1,7 @@
 ---
 id: PAIN-004
 title: The keyboard opens and the bottom CTA crushes the form
-pain: A sticky bottom CTA is perfect at rest; the moment the soft keyboard takes half the screen, the header and the CTA keep every pixel and the form collapses to a sliver — the user types into a field whose label has scrolled away.
+pain: A bottom-anchored CTA is perfect at rest; the moment the soft keyboard takes half the screen, the header and the CTA keep every pixel and the form collapses to a sliver — the user types into a field whose label has scrolled away.
 category: pain
 tags: [mobile, keyboard, visualviewport, bottom-cta, forms, viewport, layout, app-shell]
 platforms: [mobile-web, pwa]

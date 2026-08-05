@@ -4,7 +4,7 @@ summary: Wide data tables don't fit phones — reflow rows into cards (label:val
 category: pattern
 tags: [table, mobile, responsive, ops-panel, data-grid, cards, layout]
 platforms: [mobile-web, pwa, web]
-archetypes: [ops-admin-panel, ecommerce]
+archetypes: [ops-panel, ecommerce]
 status: draft
 related:
   - preview-modal-over-full-page.md

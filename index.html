@@ -1,0 +1,1222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>UX best practices — every rule in one place</title>
+<meta name="description" content="An explorable index of every rule in the Aradvision UX/UI standard: pains, principles, UI craft, patterns, techniques, archetypes and checklists." />
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    --bg:#f4f6fa; --card:#fff; --ink:#131a26; --muted:#5f6b7d; --line:#e2e8f1;
+    --accent:#111827; --chip:#eef1f6; --ok:#067647; --warn:#b54708; --bad:#c4320a;
+    --shadow:0 1px 2px rgba(16,24,40,.05), 0 8px 24px rgba(16,24,40,.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#0d1117; --card:#161b24; --ink:#e8edf5; --muted:#96a2b4; --line:#252c38;
+      --accent:#e8edf5; --chip:#212836; --ok:#4ade80; --warn:#fbbf24; --bad:#fb7185;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3); }
+  }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+    font:16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing:antialiased; }
+  a { color:inherit; }
+  .wrap { max-width:1120px; margin:0 auto; padding:0 20px 72px; }
+
+  /* ── masthead ─────────────────────────────────────────────────────────── */
+  header.top { padding:44px 0 22px; }
+  header.top h1 { font-size:clamp(1.55rem, 4vw, 2.1rem); margin:0 0 8px; letter-spacing:-.025em; }
+  header.top p.lede { margin:0 0 18px; color:var(--muted); max-width:64ch; }
+  .counts { display:flex; flex-wrap:wrap; gap:6px 8px; font-size:.78rem; color:var(--muted); }
+  .counts b { color:var(--ink); }
+
+  /* ── filter bar ───────────────────────────────────────────────────────── */
+  .filters { position:sticky; top:0; z-index:5; background:var(--bg);
+    padding:12px 0 12px; border-bottom:1px solid var(--line); margin-bottom:22px; }
+  .searchrow { display:flex; gap:8px; align-items:center; }
+  .searchrow input { flex:1 1 auto; min-width:0; font:inherit; padding:11px 13px; border-radius:11px;
+    border:1px solid var(--line); background:var(--card); color:var(--ink); }
+  .searchrow input:focus { outline:2px solid var(--accent); outline-offset:1px; }
+  .searchrow kbd { font:600 .72rem ui-monospace, SFMono-Regular, Menlo, monospace; color:var(--muted);
+    border:1px solid var(--line); border-bottom-width:2px; border-radius:6px; padding:3px 6px; background:var(--card); flex:none; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+  .chips button, .reset { font:inherit; font-size:.79rem; padding:5px 11px; border-radius:999px; cursor:pointer;
+    border:1px solid var(--line); background:var(--card); color:var(--muted); -webkit-tap-highlight-color:transparent; }
+  .chips button[aria-pressed="true"] { background:var(--accent); color:var(--bg); border-color:var(--accent); font-weight:650; }
+  .chips button .n { opacity:.6; font-variant-numeric:tabular-nums; }
+  .chips .sep { width:1px; background:var(--line); margin:2px 4px; align-self:stretch; }
+  .reset { color:var(--ink); }
+  .reset[hidden] { display:none; }
+
+  /* ── sections & cards ─────────────────────────────────────────────────── */
+  section { margin:0 0 34px; }
+  section[hidden] { display:none; }
+  .sechead { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin:0 0 4px; }
+  .sechead h2 { font-size:1.06rem; margin:0; letter-spacing:-.01em; }
+  .sechead .kind { font-size:.66rem; text-transform:uppercase; letter-spacing:.09em; color:var(--muted);
+    border:1px solid var(--line); border-radius:5px; padding:2px 6px; }
+  .sechead .cnt { font-size:.78rem; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .secsub { margin:0 0 14px; color:var(--muted); font-size:.85rem; }
+
+  .grid { display:grid; gap:12px; grid-template-columns:repeat(auto-fill, minmax(330px, 1fr)); }
+  article { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px 15px;
+    box-shadow:var(--shadow); display:flex; flex-direction:column; gap:9px; }
+  article[hidden] { display:none; }
+  .cardtop { display:flex; align-items:flex-start; gap:8px; justify-content:space-between; }
+  .cardtop h3 { font-size:.97rem; margin:0; letter-spacing:-.01em; line-height:1.35; }
+  .cardtop h3 a { text-decoration:none; }
+  .cardtop h3 a:hover { text-decoration:underline; }
+  .pid { font:700 .68rem ui-monospace, SFMono-Regular, Menlo, monospace; color:var(--muted); flex:none; }
+  .rule { margin:0; font-size:.855rem; color:var(--muted); }
+  .meta { display:flex; flex-wrap:wrap; gap:5px; margin-top:auto; padding-top:4px; }
+  .meta span { font-size:.7rem; padding:2px 8px; border-radius:999px; background:var(--chip); color:var(--muted); }
+  .meta .st { font-weight:700; }
+  .meta .st.good { color:var(--ok); } .meta .st.mid { color:var(--warn); } .meta .st.low { color:var(--bad); }
+  .links { display:flex; flex-wrap:wrap; gap:12px; font-size:.79rem; font-weight:650; }
+  .links a { text-decoration:none; border-bottom:1.5px solid var(--line); padding-bottom:1px; }
+  .links a:hover { border-bottom-color:currentColor; }
+  .links .demo { color:var(--ok); }
+
+  .empty { text-align:center; padding:52px 20px; color:var(--muted); }
+  .empty[hidden] { display:none; }
+  footer { border-top:1px solid var(--line); margin-top:20px; padding-top:18px; color:var(--muted); font-size:.8rem; }
+  footer code { background:var(--chip); padding:1px 5px; border-radius:4px; font-size:.92em; }
+  @media (max-width:520px) { .grid { grid-template-columns:1fr; } .searchrow kbd { display:none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>Every rule in one place</h1>
+  <p class="lede">The UX/UI standard for our web apps — mobile, tablet and desktop. Each card is one rule:
+    what it says, where it applies, and how far along it is. <b>Pains come first</b>, because they are the
+    evidence everything else rests on.</p>
+  <div class="counts" id="counts"></div>
+</header>
+
+<div class="filters">
+  <div class="searchrow">
+    <input id="q" type="search" placeholder="Search rules, tags, filenames…" autocomplete="off" aria-label="Search rules" />
+    <kbd>/</kbd>
+  </div>
+  <div class="chips" id="chips"></div>
+</div>
+
+<main id="out"></main>
+<p class="empty" id="empty" hidden>Nothing matches those filters.</p>
+
+<footer>
+  <p>Generated from the front-matter of every entry under <code>docs/</code> — run
+  <code>python3 tools/build-index.py</code> after adding or editing one. Do not hand-edit this file.</p>
+  <p><b>Status</b> — <code>stable</code>/<code>solved</code>: shipped and it held · <code>mitigated</code>: works,
+  with known holes · <code>draft</code>: written, not battle-tested · <code>seed</code>: we think so.
+  <b>Enforcement</b> — 🟢 code · 🟡 check · 🔴 prose.</p>
+</footer>
+</div>
+
+<script>
+const DATA = [
+{
+"id": "PAIN-001",
+"title": "Back closes the app instead of the open overlay",
+"rule": "A user opens a modal, presses Back expecting to close it, and the browser unloads the whole page instead.",
+"category": "pain",
+"status": "solved",
+"severity": "abandonment",
+"enforcement": "code",
+"tags": [
+"modal",
+"back-button",
+"history",
+"navigation",
+"mobile",
+"overlay",
+"spa"
+],
+"platforms": [
+"mobile-web",
+"pwa",
+"tablet",
+"web"
+],
+"archetypes": [
+"consumer-mobile",
+"ecommerce",
+"ops-panel",
+"fancy-app"
+],
+"path": "docs/pains/PAIN-001-back-button-exits-the-app.md",
+"demos": [
+"showcases/back-friendly-modals/"
+],
+"updated": "2026-07-29"
+},
+{
+"id": "PAIN-002",
+"title": "Every row click loses the filtered list you built",
+"rule": "An operator filters a long grid, opens a row, comes back — and the filters, sort, scroll and selection are all gone.",
+"category": "pain",
+"status": "solved",
+"severity": "friction",
+"enforcement": "check",
+"tags": [
+"ops-panel",
+"admin",
+"grid",
+"table",
+"navigation",
+"productivity",
+"context-loss"
+],
+"platforms": [
+"desktop",
+"tablet",
+"web",
+"mobile-web"
+],
+"archetypes": [
+"ops-panel"
+],
+"path": "docs/pains/PAIN-002-every-row-click-loses-your-place.md",
+"demos": [
+"showcases/ops-panel/"
+],
+"updated": "2026-07-29"
+},
+{
+"id": "PAIN-003",
+"title": "Full-height sections resize and jerk the page mid-scroll",
+"rule": "A 100vh hero looks perfect in the design tool, then on a phone it resizes the instant the address bar hides — and the whole page jumps under the user's finger.",
+"category": "pain",
+"status": "solved",
+"severity": "friction",
+"enforcement": "prose",
+"tags": [
+"mobile",
+"viewport",
+"100vh",
+"svh",
+"dvh",
+"hero",
+"layout",
+"scroll-jump"
+],
+"platforms": [
+"mobile-web",
+"pwa",
+"tablet"
+],
+"archetypes": [
+"consumer-mobile",
+"ecommerce",
+"fancy-app"
+],
+"path": "docs/pains/PAIN-003-full-height-sections-jump-mid-scroll.md",
+"demos": [
+"showcases/full-height-hero/"
+],
+"updated": "2026-07-29"
+},
+{
+"id": "PAIN-004",
+"title": "The keyboard opens and the bottom CTA crushes the form",
+"rule": "A bottom-anchored CTA is perfect at rest; the moment the soft keyboard takes half the screen, the header and the CTA keep every pixel and the form collapses to a sliver — the user types into a field whose label has scrolled away.",
+"category": "pain",
+"status": "mitigated",
+"severity": "friction",
+"enforcement": "prose",
+"tags": [
+"mobile",
+"keyboard",
+"visualviewport",
+"bottom-cta",
+"forms",
+"viewport",
+"layout",
+"app-shell"
+],
+"platforms": [
+"mobile-web",
+"pwa"
+],
+"archetypes": [
+"consumer-mobile",
+"ecommerce",
+"fancy-app"
+],
+"path": "docs/pains/PAIN-004-keyboard-crushes-the-form.md",
+"demos": [
+"showcases/keyboard-content-budget/"
+],
+"updated": "2026-07-30"
+},
+{
+"id": "",
+"title": "Feedback for every action",
+"rule": "Every user action must produce an immediate, visible response — otherwise users feel lost and retry.",
+"category": "principle",
+"status": "stable",
+"severity": "",
+"enforcement": "",
+"tags": [
+"feedback",
+"responsiveness",
+"trust",
+"states"
+],
+"platforms": [],
+"archetypes": [],
+"path": "docs/principles/feedback-for-every-action.md",
+"demos": [],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "A reload lands on the main content",
+"rule": "Reloading (or cold-opening/sharing) a page should bring the user to the main, meaningful content — never strand them inside an ephemeral overlay, a half-finished transient step, or a blank/error.",
+"category": "principle",
+"status": "draft",
+"severity": "",
+"enforcement": "",
+"tags": [
+"reload",
+"state",
+"url",
+"overlays",
+"robustness",
+"navigation"
+],
+"platforms": [],
+"archetypes": [],
+"path": "docs/principles/reload-returns-to-main-content.md",
+"demos": [
+"showcases/ops-panel/"
+],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "Design every state",
+"rule": "A screen isn't done until its empty, loading, error, and partial states are designed — not just the happy path.",
+"category": "principle",
+"status": "draft",
+"severity": "",
+"enforcement": "",
+"tags": [
+"states",
+"empty-state",
+"error-handling",
+"loading",
+"robustness"
+],
+"platforms": [],
+"archetypes": [],
+"path": "docs/principles/design-every-state.md",
+"demos": [],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "Forgiveness: prefer undo over confirm",
+"rule": "Let users act fast and recover from mistakes — favor reversible actions and undo over interruptive confirm dialogs.",
+"category": "principle",
+"status": "draft",
+"severity": "",
+"enforcement": "",
+"tags": [
+"forgiveness",
+"undo",
+"error-prevention",
+"trust",
+"confirmation"
+],
+"platforms": [],
+"archetypes": [],
+"path": "docs/principles/forgiveness-undo-over-confirm.md",
+"demos": [],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "Visual hierarchy guides the eye",
+"rule": "Use size, weight, color, and spacing so the most important thing is obviously the most important.",
+"category": "principle",
+"status": "draft",
+"severity": "",
+"enforcement": "",
+"tags": [
+"hierarchy",
+"layout",
+"attention",
+"emphasis",
+"scanning"
+],
+"platforms": [],
+"archetypes": [],
+"path": "docs/principles/visual-hierarchy.md",
+"demos": [],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "Color, contrast & dark mode",
+"rule": "Use semantic color tokens, meet WCAG AA contrast, and design dark mode as its own theme — not an inverted afterthought.",
+"category": "ui",
+"status": "draft",
+"severity": "",
+"enforcement": "",
+"tags": [
+"color",
+"contrast",
+"accessibility",
+"dark-mode",
+"design-tokens",
+"theming"
+],
+"platforms": [
+"mobile-web",
+"pwa",
+"desktop",
+"web"
+],
+"archetypes": [],
+"path": "docs/ui/color-contrast-and-dark-mode.md",
+"demos": [],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "Full-height sections & the mobile viewport (the 100vh trap)",
+"rule": "On mobile, 100vh isn't the visible area — the address bar shows/hides and changes it. Size full-height heroes with a STATIC viewport unit (or a frozen measurement) so they never resize mid-scroll.",
+"category": "ui",
+"status": "draft",
+"severity": "",
+"enforcement": "",
+"tags": [
+"mobile",
+"viewport",
+"100vh",
+"svh",
+"dvh",
+"hero",
+"layout",
+"scroll-jump"
+],
+"platforms": [
+"mobile-web",
+"pwa"
+],
+"archetypes": [
+"fancy-app",
+"ecommerce",
+"consumer-mobile"
+],
+"path": "docs/ui/full-height-and-the-mobile-viewport.md",
+"demos": [
+"showcases/full-height-hero/"
+],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "Intentional tap & touch feedback (no default blue flash)",
+"rule": "Mobile browsers add their own tap highlight, long-press menu, and selection on touch — replace these defaults with your own feedback, but keep keyboard focus accessible.",
+"category": "ui",
+"status": "draft",
+"severity": "",
+"enforcement": "",
+"tags": [
+"mobile",
+"touch",
+"tap-highlight",
+"focus",
+"accessibility",
+"polish",
+"webkit"
+],
+"platforms": [
+"mobile-web",
+"pwa"
+],
+"archetypes": [],
+"path": "docs/ui/tap-and-touch-feedback.md",
+"demos": [
+"showcases/tap-feedback/"
+],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "Spacing & layout (the 8-pt grid)",
+"rule": "Snap all spacing to one scale (multiples of 4/8px) — consistent rhythm is the fastest path to a \"designed\" look.",
+"category": "ui",
+"status": "draft",
+"severity": "",
+"enforcement": "",
+"tags": [
+"spacing",
+"layout",
+"grid",
+"rhythm",
+"consistency",
+"design-tokens"
+],
+"platforms": [
+"mobile-web",
+"pwa",
+"desktop",
+"web"
+],
+"archetypes": [],
+"path": "docs/ui/spacing-and-layout.md",
+"demos": [],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "Type scale & readability",
+"rule": "Use a small, consistent type scale and readable defaults — text is 90% of most UIs.",
+"category": "ui",
+"status": "draft",
+"severity": "",
+"enforcement": "",
+"tags": [
+"typography",
+"readability",
+"hierarchy",
+"accessibility"
+],
+"platforms": [
+"mobile-web",
+"pwa",
+"desktop",
+"web"
+],
+"archetypes": [],
+"path": "docs/ui/type-scale-and-readability.md",
+"demos": [],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "Back-friendly modals & overlays",
+"rule": "Make Back (and Esc, scrim, ✕) close the open modal/sheet — not unload the whole page. Hook overlays into browser history.",
+"category": "pattern",
+"status": "draft",
+"severity": "",
+"enforcement": "",
+"tags": [
+"modal",
+"back-button",
+"history",
+"navigation",
+"mobile",
+"overlay",
+"bottom-sheet"
+],
+"platforms": [
+"mobile-web",
+"pwa",
+"web"
+],
+"archetypes": [
+"consumer-mobile",
+"ecommerce"
+],
+"path": "docs/patterns/back-friendly-modals.md",
+"demos": [
+"showcases/back-friendly-modals/"
+],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "Bottom CTAs & the soft keyboard — the content budget",
+"rule": "When the keyboard opens it takes half the screen; guarantee the content region keeps a minimum share of what's left (≈45%) and make the header and the CTA bar yield to pay for it. The bar belongs in the shell's flex flow — not position:fixed, not position:sticky.",
+"category": "pattern",
+"status": "draft",
+"severity": "",
+"enforcement": "",
+"tags": [
+"mobile",
+"keyboard",
+"visualviewport",
+"cta",
+"forms",
+"viewport",
+"layout",
+"app-shell"
+],
+"platforms": [
+"mobile-web",
+"pwa"
+],
+"archetypes": [
+"consumer-mobile",
+"ecommerce",
+"fancy-app"
+],
+"path": "docs/patterns/bottom-cta-and-the-soft-keyboard.md",
+"demos": [
+"showcases/keyboard-content-budget/"
+],
+"updated": "2026-07-30"
+},
+{
+"id": "",
+"title": "Bottom sheets & the thumb zone",
+"rule": "On mobile, put primary actions and surfaces within easy thumb reach — anchor them to the bottom, not the top.",
+"category": "pattern",
+"status": "draft",
+"severity": "",
+"enforcement": "",
+"tags": [
+"mobile",
+"bottom-sheet",
+"thumb-zone",
+"navigation",
+"reachability",
+"touch"
+],
+"platforms": [
+"mobile-web",
+"pwa"
+],
+"archetypes": [
+"consumer-mobile",
+"ecommerce",
+"fancy-app"
+],
+"path": "docs/patterns/bottom-sheet-and-thumb-zone.md",
+"demos": [],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "Empty states",
+"rule": "Turn \"nothing here\" into onboarding — explain what goes here, why it's empty, and the one action to fill it.",
+"category": "pattern",
+"status": "draft",
+"severity": "",
+"enforcement": "",
+"tags": [
+"empty-state",
+"onboarding",
+"first-run",
+"no-results",
+"states"
+],
+"platforms": [
+"mobile-web",
+"pwa",
+"desktop",
+"web"
+],
+"archetypes": [],
+"path": "docs/patterns/empty-states.md",
+"demos": [],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "Inline form validation",
+"rule": "Validate on blur with clear, adjacent messages — guide users to success instead of scolding them after submit.",
+"category": "pattern",
+"status": "draft",
+"severity": "",
+"enforcement": "",
+"tags": [
+"forms",
+"validation",
+"input",
+"feedback",
+"errors"
+],
+"platforms": [
+"mobile-web",
+"pwa",
+"desktop",
+"web"
+],
+"archetypes": [],
+"path": "docs/patterns/inline-form-validation.md",
+"demos": [],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "Lock background scroll when a modal is open",
+"rule": "While an overlay is open, freeze the page behind it (and stop scroll-chaining) — but keep the modal's own content scrollable.",
+"category": "pattern",
+"status": "draft",
+"severity": "",
+"enforcement": "",
+"tags": [
+"modal",
+"scroll-lock",
+"overlay",
+"mobile",
+"scroll",
+"bottom-sheet",
+"ios"
+],
+"platforms": [
+"mobile-web",
+"pwa",
+"web"
+],
+"archetypes": [
+"consumer-mobile",
+"ecommerce"
+],
+"path": "docs/patterns/lock-scroll-when-modal-open.md",
+"demos": [
+"showcases/back-friendly-modals/"
+],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "Preview-first: quick modal over full-page navigation",
+"rule": "In data grids (esp. ops panels), open a fast preview modal with quick actions on row click; escalate to a full page only when the task is heavy — and never lose the filtered list.",
+"category": "pattern",
+"status": "draft",
+"severity": "",
+"enforcement": "",
+"tags": [
+"ops-panel",
+"admin",
+"grid",
+"table",
+"modal",
+"preview",
+"navigation",
+"productivity"
+],
+"platforms": [
+"web",
+"desktop",
+"mobile-web"
+],
+"archetypes": [
+"ops-panel"
+],
+"path": "docs/patterns/preview-modal-over-full-page.md",
+"demos": [
+"showcases/ops-panel/"
+],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "Responsive tables on mobile (don't let borders clip the data)",
+"rule": "Wide data tables don't fit phones — reflow rows into cards (label:value), prioritize key columns, or use a sticky-column horizontal scroll. Never just shrink until content is cut off.",
+"category": "pattern",
+"status": "draft",
+"severity": "",
+"enforcement": "",
+"tags": [
+"table",
+"mobile",
+"responsive",
+"ops-panel",
+"data-grid",
+"cards",
+"layout"
+],
+"platforms": [
+"mobile-web",
+"pwa",
+"web"
+],
+"archetypes": [
+"ops-panel",
+"ecommerce"
+],
+"path": "docs/patterns/responsive-tables-on-mobile.md",
+"demos": [
+"showcases/ops-panel/"
+],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "Swipe to dismiss (drawers & sheets)",
+"rule": "Let an overlay be dismissed by swiping it back the way it came in — left drawer swipes left, right drawer swipes right, bottom sheet swipes down.",
+"category": "pattern",
+"status": "draft",
+"severity": "",
+"enforcement": "",
+"tags": [
+"gesture",
+"swipe",
+"drawer",
+"side-panel",
+"bottom-sheet",
+"modal",
+"mobile",
+"dismissal"
+],
+"platforms": [
+"mobile-web",
+"pwa"
+],
+"archetypes": [
+"consumer-mobile",
+"ecommerce"
+],
+"path": "docs/patterns/swipe-to-dismiss-drawers.md",
+"demos": [
+"showcases/back-friendly-modals/"
+],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "Skeleton loading",
+"rule": "Show a gray placeholder of the upcoming layout instead of a blank screen or spinner — the app feels faster.",
+"category": "technique",
+"status": "stable",
+"severity": "",
+"enforcement": "",
+"tags": [
+"perceived-performance",
+"loading",
+"states",
+"motion"
+],
+"platforms": [
+"mobile-web",
+"pwa",
+"desktop",
+"web"
+],
+"archetypes": [],
+"path": "docs/techniques/skeleton-loading.md",
+"demos": [
+"showcases/skeleton-loading/"
+],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "Micro-interactions",
+"rule": "Small, purposeful, sub-300ms animations that confirm actions and add life — used with restraint and reduced-motion support.",
+"category": "technique",
+"status": "draft",
+"severity": "",
+"enforcement": "",
+"tags": [
+"motion",
+"animation",
+"feedback",
+"delight",
+"micro-interaction"
+],
+"platforms": [
+"mobile-web",
+"pwa",
+"desktop",
+"web"
+],
+"archetypes": [],
+"path": "docs/techniques/micro-interactions.md",
+"demos": [],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "Optimistic UI",
+"rule": "For high-confidence actions, update the UI instantly and reconcile with the server in the background — roll back on failure.",
+"category": "technique",
+"status": "draft",
+"severity": "",
+"enforcement": "",
+"tags": [
+"perceived-performance",
+"optimistic",
+"responsiveness",
+"state",
+"feedback"
+],
+"platforms": [
+"mobile-web",
+"pwa",
+"desktop",
+"web"
+],
+"archetypes": [],
+"path": "docs/techniques/optimistic-ui.md",
+"demos": [],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "Archetype: Ops / admin panel",
+"rule": "For technical users managing a platform — optimize for density, speed, and bulk control, not hand-holding.",
+"category": "archetype",
+"status": "draft",
+"severity": "",
+"enforcement": "",
+"tags": [
+"admin",
+"dashboard",
+"tables",
+"power-user",
+"productivity"
+],
+"platforms": [
+"desktop",
+"web"
+],
+"archetypes": [
+"ops-panel"
+],
+"path": "docs/archetypes/ops-admin-panel.md",
+"demos": [],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "Archetype: Consumer mobile app",
+"rule": "For non-technical, general-public users — optimize for obviousness, guidance, and forgiveness.",
+"category": "archetype",
+"status": "seed",
+"severity": "",
+"enforcement": "",
+"tags": [
+"mobile",
+"consumer",
+"simplicity",
+"onboarding"
+],
+"platforms": [
+"mobile-web",
+"pwa"
+],
+"archetypes": [
+"consumer-mobile"
+],
+"path": "docs/archetypes/consumer-mobile-app.md",
+"demos": [],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "Archetype: Conversational / bot UI",
+"rule": "Chat & assistant interfaces — make turn-taking clear, set expectations, and build trust in a free-form box.",
+"category": "archetype",
+"status": "seed",
+"severity": "",
+"enforcement": "",
+"tags": [
+"chatbot",
+"conversational",
+"ai",
+"assistant",
+"messaging"
+],
+"platforms": [
+"mobile-web",
+"pwa",
+"web",
+"conversational"
+],
+"archetypes": [
+"conversational-bot"
+],
+"path": "docs/archetypes/conversational-bot.md",
+"demos": [],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "Archetype: E-commerce / online shop",
+"rule": "Optimize for trust and conversion — help users find, decide, and buy with minimum friction.",
+"category": "archetype",
+"status": "seed",
+"severity": "",
+"enforcement": "",
+"tags": [
+"ecommerce",
+"conversion",
+"trust",
+"checkout"
+],
+"platforms": [
+"mobile-web",
+"pwa",
+"web"
+],
+"archetypes": [
+"ecommerce"
+],
+"path": "docs/archetypes/ecommerce.md",
+"demos": [],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "Archetype: Fancy app",
+"rule": "Does a few things, but beautifully — polish, motion, and delight are the product.",
+"category": "archetype",
+"status": "seed",
+"severity": "",
+"enforcement": "",
+"tags": [
+"delight",
+"motion",
+"polish",
+"visual"
+],
+"platforms": [
+"mobile-web",
+"pwa",
+"web"
+],
+"archetypes": [
+"fancy-app"
+],
+"path": "docs/archetypes/fancy-app.md",
+"demos": [],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "Archetype: Game app",
+"rule": "Players want feedback, flow, and reward — juicy response and a tuned difficulty/onboarding curve.",
+"category": "archetype",
+"status": "seed",
+"severity": "",
+"enforcement": "",
+"tags": [
+"games",
+"feedback",
+"flow",
+"onboarding",
+"motion"
+],
+"platforms": [
+"mobile-web",
+"pwa",
+"web"
+],
+"archetypes": [
+"game"
+],
+"path": "docs/archetypes/game-app.md",
+"demos": [],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "Accessibility (a11y) checklist",
+"rule": "A pragmatic baseline to make any UI usable by keyboard, screen reader, and low-vision users — run before shipping.",
+"category": "checklist",
+"status": "draft",
+"severity": "",
+"enforcement": "",
+"tags": [
+"accessibility",
+"a11y",
+"wcag",
+"keyboard",
+"screen-reader",
+"inclusive"
+],
+"platforms": [
+"mobile-web",
+"pwa",
+"desktop",
+"web"
+],
+"archetypes": [],
+"path": "docs/checklists/accessibility-checklist.md",
+"demos": [],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "Mobile UX checklist",
+"rule": "A pre-ship pass for any mobile-facing screen — touch, feedback, performance, accessibility.",
+"category": "checklist",
+"status": "draft",
+"severity": "",
+"enforcement": "",
+"tags": [
+"mobile",
+"checklist",
+"pre-launch",
+"accessibility"
+],
+"platforms": [
+"mobile-web",
+"pwa"
+],
+"archetypes": [],
+"path": "docs/checklists/mobile-ux-checklist.md",
+"demos": [],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "New-project UX kickoff checklist",
+"rule": "Decide the fundamentals — archetype, platform, key flows, and constraints — before designing screens.",
+"category": "checklist",
+"status": "draft",
+"severity": "",
+"enforcement": "",
+"tags": [
+"kickoff",
+"planning",
+"archetype",
+"scoping",
+"founder"
+],
+"platforms": [],
+"archetypes": [],
+"path": "docs/checklists/new-project-kickoff.md",
+"demos": [],
+"updated": "2026-06-16"
+},
+{
+"id": "",
+"title": "Pain review — before you design a surface",
+"rule": "Filter the pain registry to your archetype and platform, then give every applicable pain one of three answers: addressed, not applicable, or accepted.",
+"category": "checklist",
+"status": "draft",
+"severity": "",
+"enforcement": "",
+"tags": [
+"design-review",
+"pains",
+"kickoff",
+"qa"
+],
+"platforms": [],
+"archetypes": [],
+"path": "docs/checklists/pain-review.md",
+"demos": [],
+"updated": "2026-07-29"
+}
+];
+const SECTIONS = [["pain", "💢 Pains", "evidence", "What actually broke. The pain is binding; the solution is a reference."], ["principle", "🧭 Principles", "craft", "Timeless laws. Why any of the rest holds."], ["ui", "🎨 UI craft", "craft", "How it looks — type, colour, spacing, viewport."], ["pattern", "🧩 Patterns", "craft", "How it behaves — reusable answers to recurring problems."], ["technique", "⚡ Techniques", "craft", "How it feels — perceived performance and smoothness."], ["archetype", "📦 Archetypes", "context", "What you're building. Playbooks per product shape."], ["checklist", "✅ Checklists", "action", "Run these before you ship."]];
+
+const out = document.getElementById('out');
+const q = document.getElementById('q');
+const chipbar = document.getElementById('chips');
+const empty = document.getElementById('empty');
+
+const STATUS_CLASS = { stable:'good', solved:'good', mitigated:'mid', draft:'', seed:'', open:'low' };
+const ENFORCE_ICON = { code:'🟢 code', check:'🟡 check', prose:'🔴 prose' };
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+// One filter axis at a time keeps the UI honest: category, platform, archetype.
+const facets = [
+  { key:'category',   label:'Kind' },
+  { key:'platforms',  label:'Platform' },
+  { key:'archetypes', label:'Archetype' },
+];
+const active = { category:null, platforms:null, archetypes:null, demo:false };
+
+function values(key) {
+  const counts = new Map();
+  for (const e of DATA) for (const v of [].concat(e[key] || [])) if (v) counts.set(v, (counts.get(v) || 0) + 1);
+  return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+}
+
+function buildChips() {
+  const frag = [];
+  for (const f of facets) {
+    if (frag.length) frag.push('<div class="sep"></div>');
+    for (const [v, n] of values(f.key)) {
+      frag.push(`<button data-facet="${f.key}" data-val="${esc(v)}" aria-pressed="false">${esc(v)} <span class="n">${n}</span></button>`);
+    }
+  }
+  frag.push('<div class="sep"></div>');
+  const withDemo = DATA.filter((e) => e.demos.length).length;
+  frag.push(`<button data-facet="demo" data-val="1" aria-pressed="false">▶ has demo <span class="n">${withDemo}</span></button>`);
+  frag.push('<button class="reset" id="reset" hidden>clear filters</button>');
+  chipbar.innerHTML = frag.join('');
+  chipbar.addEventListener('click', (ev) => {
+    const b = ev.target.closest('button');
+    if (!b) return;
+    if (b.id === 'reset') { active.category = active.platforms = active.archetypes = null; active.demo = false; q.value = ''; }
+    else if (b.dataset.facet === 'demo') active.demo = !active.demo;
+    else active[b.dataset.facet] = active[b.dataset.facet] === b.dataset.val ? null : b.dataset.val;
+    render();
+  });
+}
+
+function matches(e) {
+  if (active.category && e.category !== active.category) return false;
+  if (active.platforms && !(e.platforms || []).includes(active.platforms)) return false;
+  if (active.archetypes && !(e.archetypes || []).includes(active.archetypes)) return false;
+  if (active.demo && !e.demos.length) return false;
+  const term = q.value.trim().toLowerCase();
+  if (!term) return true;
+  return [e.id, e.title, e.rule, e.path, (e.tags || []).join(' '), (e.platforms || []).join(' '),
+          (e.archetypes || []).join(' ')].join(' ').toLowerCase().includes(term);
+}
+
+function card(e) {
+  const st = e.status
+    ? `<span class="st ${STATUS_CLASS[e.status] || ''}">${esc(e.status)}</span>` : '';
+  const enf = e.enforcement ? `<span>${ENFORCE_ICON[e.enforcement] || esc(e.enforcement)}</span>` : '';
+  const chips = [...(e.platforms || []), ...(e.archetypes || [])]
+    .map((v) => `<span>${esc(v)}</span>`).join('');
+  const demos = e.demos.map((d) =>
+    `<a class="demo" href="${esc(d)}index.html">▶ demo</a>`).join('');
+  return `<article>
+    <div class="cardtop">
+      <h3><a href="${esc(e.path)}">${esc(e.title)}</a></h3>
+      ${e.id ? `<span class="pid">${esc(e.id)}</span>` : ''}
+    </div>
+    <p class="rule">${esc(e.rule)}</p>
+    <div class="meta">${st}${enf}${chips}</div>
+    <div class="links"><a href="${esc(e.path)}">read →</a>${demos}</div>
+  </article>`;
+}
+
+function render() {
+  const shown = DATA.filter(matches);
+  out.innerHTML = SECTIONS.map(([key, label, kind, blurb]) => {
+    const items = shown.filter((e) => e.category === key);
+    if (!items.length) return '';
+    return `<section>
+      <div class="sechead"><h2>${label}</h2><span class="kind">${kind}</span>
+        <span class="cnt">${items.length}</span></div>
+      <p class="secsub">${blurb}</p>
+      <div class="grid">${items.map(card).join('')}</div>
+    </section>`;
+  }).join('');
+
+  empty.hidden = shown.length > 0;
+  for (const b of chipbar.querySelectorAll('button[data-facet]')) {
+    const on = b.dataset.facet === 'demo' ? active.demo : active[b.dataset.facet] === b.dataset.val;
+    b.setAttribute('aria-pressed', String(on));
+  }
+  const dirty = active.category || active.platforms || active.archetypes || active.demo || q.value;
+  document.getElementById('reset').hidden = !dirty;
+
+  document.getElementById('counts').innerHTML =
+    `<span><b>${shown.length}</b> of <b>${DATA.length}</b> rules shown</span>` +
+    SECTIONS.map(([k, l]) => {
+      const n = DATA.filter((e) => e.category === k).length;
+      return n ? `<span>· ${l.replace(/^\S+\s/, '')} <b>${n}</b></span>` : '';
+    }).join('');
+}
+
+q.addEventListener('input', render);
+document.addEventListener('keydown', (ev) => {
+  if (ev.key === '/' && document.activeElement !== q) { ev.preventDefault(); q.focus(); q.select(); }
+  if (ev.key === 'Escape' && document.activeElement === q) { q.value = ''; render(); q.blur(); }
+});
+
+buildChips();
+render();
+</script>
+</body>
+</html>
